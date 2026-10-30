@@ -1,33 +1,29 @@
-# Arquitetura dos ambientes PHP
+# Arquitetura — catálogo de Dev Container Templates
 
-## Contexto
+## Escopo
 
-Aplicações existentes em PHP 5.1.6 e PHP 5.4 estão sendo adaptadas para PHP 8.5. Precisamos preservar a capacidade de executar fluxos antigos e comparar seus resultados com os novos.
+Este repositório distribui configurações reutilizáveis de ambiente de desenvolvimento. **Não hospeda aplicações PHP, código migrado nem testes funcionais de projetos de terceiros.** É permitido incluir exemplos mínimos autocontidos exclusivamente para validar execução e depuração no VS Code.
 
-## Componentes previstos
+## Templates
 
-- `php-5.1.6`: runtime histórico isolado para executar o código original.
-- `php-5.4`: segundo runtime histórico isolado.
-- `php-8.5`: ambiente de desenvolvimento e execução do código modernizado.
-- Orquestração opcional com Docker Compose para rodar runtimes lado a lado, quando um projeto exigir.
-- Harness de testes de caracterização/regressão, com fixtures equivalentes e comparação de resultados.
+- `php-5.1.6`: ambiente isolado para manter e depurar aplicações legadas.
+- `php-5.4`: ambiente isolado para manter e depurar aplicações legadas.
+- `php-8.5`: ambiente para desenvolver e depurar a versão modernizada.
 
-## Princípios
+Cada template terá metadados `devcontainer-template.json`, `.devcontainer/devcontainer.json` e, quando necessário, Dockerfile/scripts. A configuração é aplicada no **repositório da aplicação**, que continua dono de seu código, dependências e testes de regressão.
 
-1. Templates reutilizáveis e versionados, um por runtime.
-2. Runtimes legados não devem ter acesso a dados de produção ou serviços externos por padrão.
-3. Dependências e extensões devem ser inventariadas antes da construção das imagens.
-4. Código e dependências podem exigir montagens separadas; evitar compartilhar `vendor/` entre versões incompatíveis.
-5. Testes de comportamento devem separar diferenças intencionais de regressões.
-6. Não assumir previamente o servidor HTTP, banco de dados ou extensões usadas pelos sistemas existentes.
+## Validação do catálogo
+
+Verificar build do ambiente, versão do PHP, extensões necessárias, integração do VS Code e funcionamento do debugger. Um script PHP pequeno e autocontido pode ser usado como smoke test de breakpoints. Não incorporar código real dos legados.
+
+## Restrições
+
+- PHP 5.1.6 e 5.4 estão sem suporte: fixar dependências, reduzir privilégios e evitar exposição externa.
+- Não assumir servidor HTTP, banco ou extensões sem levantamento.
+- Não compartilhar diretórios de dependências incompatíveis entre runtimes.
 
 ## Questões em aberto
 
-- Quais aplicações precisam de servidor web, CLI ou ambos?
-- Quais extensões PHP e serviços externos cada legado utiliza?
-- A migração ocorrerá no mesmo repositório ou em repositórios separados?
-- Qual a matriz mínima de cenários de negócio a preservar?
-
-## Estado
-
-Documento de arquitetura inicial; não representa uma implementação validada.
+- Extensões e servidores HTTP necessários para cada versão.
+- Versões de Xdebug compatíveis e forma de integração ao VS Code.
+- Estratégia de publicação dos templates no GHCR.
