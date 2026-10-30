@@ -1,0 +1,23 @@
+{
+  "name": "PHP 5.1.6 Legacy",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "workspaceFolder": "/var/www/html",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/var/www/html,type=bind",
+  "forwardPorts": [
+    80
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "xdebug.php-debug"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php"
+      }
+    }
+  },
+  "remoteUser": "root"
+}
