@@ -1,23 +1,18 @@
-# ADR-002 — Testes de caracterização durante a migração
+# ADR-002 — Responsabilidade pelos testes de regressão
 
 - Data: 2026-10-30
-- Status: Aceita (direção arquitetural)
+- Status: Aceita (escopo revisado)
 
 ## Contexto
 
-A migração precisa preservar regras de negócio observáveis, permitindo verificar funcionalidades antigas enquanto novas versões são implementadas.
+Os runtimes PHP 5.1.6 e 5.4 servem de referência para migração de aplicações para PHP 8.5. Este repositório, porém, é exclusivamente um catálogo de templates de ambiente.
 
 ## Decisão
 
-Utilizar os runtimes legados como referência para testes de caracterização. Planejar fixtures determinísticas e comparação de resultados com o PHP 8.5, incluindo respostas HTTP, cálculos, formatações e alterações de estado quando aplicável.
+**Testes funcionais, fixtures de negócio e comparações de resultados pertencem aos repositórios das aplicações**, não a este repositório. Aqui serão mantidos apenas testes técnicos dos templates (build, runtime, extensões, integração com o VS Code e depuração), podendo incluir código PHP mínimo de exemplo para smoke tests.
 
-## Cuidados
+## Consequências
 
-- Normalizar campos variáveis como datas e identificadores.
-- Registrar explicitamente diferenças intencionais e bugs corrigidos.
-- Evitar acesso a dados reais de produção.
-- Não exigir frameworks de teste modernos nos runtimes legados; o executor de comparação pode rodar externamente.
-
-## Pendente
-
-Definir ferramenta de teste, formato de fixtures, cenários prioritários e organização dos repositórios das aplicações.
+- Templates desacoplados dos sistemas migrados.
+- Cada aplicação decide seu fluxo de migração e regressão.
+- O catálogo valida apenas a infraestrutura de desenvolvimento.
