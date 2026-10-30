@@ -1,31 +1,30 @@
-# Roadmap
+# Roadmap — Dev Container Templates
 
-## Fase 0 — Definições (em andamento)
+## Fase 0 — Definições
 
-- [x] Definir runtimes PHP 5.1.6, 5.4 e 8.5.
-- [x] Registrar propósito dos runtimes legados e do alvo de migração.
-- [x] Criar repositório e documentação inicial.
-- [ ] Inventariar extensões, bancos, serviços e modos de execução dos projetos.
-- [ ] Definir estratégia de migração (mesmo repositório ou separados).
+- [x] Definir três templates: PHP 5.1.6, PHP 5.4 e PHP 8.5.
+- [x] Estabelecer que o repositório contém somente templates, documentação e smoke tests mínimos de debug.
+- [x] Registrar arquitetura e ADRs.
+- [ ] Levantar extensões e requisitos de debug de cada versão.
 
-## Fase 1 — Templates mínimos
+## Fase 1 — Implementação dos templates
 
-- [ ] Criar estrutura conforme especificação Dev Container Templates.
-- [ ] Construir e validar runtime PHP 8.5.
-- [ ] Construir e validar runtime PHP 5.4.
-- [ ] Construir e validar runtime PHP 5.1.6.
-- [ ] Documentar limitações de compilação e segurança.
+- [ ] Criar estrutura oficial de Dev Container Templates.
+- [ ] Implementar template PHP 8.5.
+- [ ] Implementar template PHP 5.4.
+- [ ] Implementar template PHP 5.1.6.
+- [ ] Configurar e documentar debugging no VS Code por versão.
 
-## Fase 2 — Testes comparativos
+## Fase 2 — Validação
 
-- [ ] Criar fixtures e harness de caracterização.
-- [ ] Rodar cenários equivalentes nos runtimes aplicáveis.
-- [ ] Registrar diferenças e critérios de aceite.
+- [ ] Validar builds e versões dos interpretadores.
+- [ ] Adicionar exemplos PHP mínimos para verificar breakpoints.
+- [ ] Testar experiência de uso no VS Code.
 
-## Fase 3 — Automação e distribuição
+## Fase 3 — Distribuição
 
-- [ ] Validar templates em CI.
-- [ ] Publicar artefatos versionados no GHCR.
-- [ ] Documentar instalação e uso no VS Code.
+- [ ] Automatizar validação em CI.
+- [ ] Publicar templates versionados no GHCR.
+- [ ] Documentar aplicação dos templates em repositórios externos.
 
-Nenhuma fase de implementação está concluída.
+Fora do escopo: código de aplicações, migração de regras de negócio e suítes de regressão das aplicações.
