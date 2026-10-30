@@ -1,0 +1,16 @@
+{
+  "id": "php-5.1.6",
+  "version": "0.1.0",
+  "name": "PHP 5.1.6 Legacy (Apache CGI)",
+  "description": "Legacy PHP 5.1.6 Apache CGI development environment; Xdebug 2.0.0 experimental VS Code integration",
+  "documentationURL": "https://github.com/guionardo/devcontainer-templates",
+  "platforms": [
+    "PHP"
+  ],
+  "keywords": [
+    "php",
+    "legacy",
+    "xdebug",
+    "apache"
+  ]
+}
