@@ -108,17 +108,17 @@ The installer uses Git source and defaults to `main`. That can differ from the l
 
 The repository uses a coordinated version for all three templates. That is a project convention; the underlying specification also supports independent template versions.
 
-A tag such as `v0.1.1` starts publication only if all three metadata files declare `0.1.1` and the tagged commit belongs to `main` history. The workflow first runs the release validator, installer tests, JSON checks, and Compose validation, then invokes the official publication action with package write permission.
+A tag such as `v1.0.0` starts publication only if all three metadata files declare `1.0.0` and the tagged commit belongs to `main` history. The workflow first runs the release validator, installer tests, JSON checks, and Compose validation, then invokes the official publication action with package write permission.
 
 For a prepared release, the maintainer runs:
 
 ```sh
-node scripts/validate-release.cjs v0.1.1
-git tag -a v0.1.1 -m "Release Dev Container Templates 0.1.1"
-git push origin v0.1.1
+node scripts/validate-release.cjs v1.0.0
+git tag -a v1.0.0 -m "Release Dev Container Templates 1.0.0"
+git push origin v1.0.0
 ```
 
-The English source update prepares version `0.1.1`; the manual results discussed here belong to the published `0.1.0` baseline. A documentation edit is not a reason to silently replace an existing package version.
+The `1.0.0` milestone consolidates the English catalog and release automation; the manual results discussed here belong to the published `0.1.0` baseline. A documentation edit is not a reason to silently replace an existing package version.
 
 ## What the manual test actually established
 

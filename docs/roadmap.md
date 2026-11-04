@@ -21,7 +21,7 @@
 
 ## Next
 
-- [ ] Release the English source update as OCI version `0.1.1`.
+- [x] Consolidate the English catalog as release `1.0.0`.
 - [ ] Pin historical source checksums and base image digests.
 - [ ] Validate dependency installation without cached build layers.
 - [ ] Automate PHP image builds and HTTP smoke checks in CI.

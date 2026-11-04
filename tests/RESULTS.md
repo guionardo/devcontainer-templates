@@ -41,7 +41,7 @@ The English revision updates example identifiers and messages without changing t
 
 The validation workflow checks installer behavior, release rules, JSON, and Compose configurations for templates and examples. It does not claim to build runtime images or operate the VS Code GUI.
 
-The English update uses source template version `0.1.1`; the recorded manual GUI validation remains attributed to `0.1.0`.
+The consolidated English release uses template version `1.0.0`; the recorded manual GUI validation remains attributed to `0.1.0`.
 
 ## English revision checks
 

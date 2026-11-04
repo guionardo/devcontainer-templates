@@ -9,24 +9,24 @@ Install Node.js/npm and choose **one** command from the root of an existing proj
 PHP 5.1.6:
 
 ```sh
-npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.1.6:0.1.0
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.1.6:1.0.0
 ```
 
 PHP 5.4:
 
 ```sh
-npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:0.1.0
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:1.0.0
 ```
 
 PHP 8.5:
 
 ```sh
-npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-8.5:0.1.0
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-8.5:1.0.0
 ```
 
 These commands work in PowerShell, Git Bash, WSL, Linux, and macOS when Node.js/npm is available. To target another directory, use `--workspace-folder "C:\dev\my-app"`, for example.
 
-The suffix `:0.1.0` selects a template release, not a PHP or CLI version. The examples use the published release that was manually validated. Source metadata is now `0.1.1`; that version requires its own release before it can be downloaded from GHCR.
+The suffix `:1.0.0` selects a template release, not a PHP or CLI version. The commands select the consolidated `1.0.0` release. The recorded manual GUI validation used the earlier `0.1.0` baseline; current package availability is shown by the publication workflow.
 
 Apply in a working branch and inspect existing files first. The official CLI does not guarantee the backup and preservation behavior of our custom shell installer. For a customized environment, apply a new OCI release in a temporary directory and merge the changes.
 
@@ -88,7 +88,7 @@ For example, this existing commit contains the source baseline used before the E
 curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/40899ef915b00f47493140ec21049b90f2a94777/scripts/install.sh | sh -s -- --php 5.4 --ref 40899ef915b00f47493140ec21049b90f2a94777
 ```
 
-A published OCI version does not prove that a Git tag of the same name exists. Check the repository's tags before using a tag reference. A future Git `v0.1.1` tag and OCI `:0.1.1` version are distinct identifiers.
+A published OCI version does not prove that a Git tag of the same name exists. Check the repository's tags before using a tag reference. Git `v1.0.0` and OCI `:1.0.0` are distinct identifiers.
 
 For a locally cloned catalog:
 
@@ -121,20 +121,20 @@ The OCI artifacts distribute configurations, not prebuilt runtime images. The fi
 
 The [publication workflow](../.github/workflows/publish-templates.yaml) runs when a `vMAJOR.MINOR.PATCH` tag is pushed. An ordinary `main` push runs applicable checks but does not publish packages.
 
-Although the standard supports independent template versions, this repository uses **one version across all three templates**. A `v0.1.1` tag requires `"version": "0.1.1"` in all three metadata files.
+Although the standard supports independent template versions, this repository uses **one version across all three templates**. A `v1.0.0` tag requires `"version": "1.0.0"` in all three metadata files.
 
-For the prepared English update:
+The `v1.0.0` tag consolidates the current catalog. For a later release, choose a new version, update all three metadata files, and substitute that version in the commands below:
 
-1. Review changes and ensure all three metadata versions are `0.1.1`.
+1. Review changes and ensure all three metadata versions are `1.0.0`.
 2. Commit and push to `main`; wait for validation to pass.
 3. Tag the intended commit and push that tag explicitly:
 
 ```sh
 git switch main
 git pull --ff-only origin main
-node scripts/validate-release.cjs v0.1.1
-git tag -a v0.1.1 -m "Release Dev Container Templates 0.1.1"
-git push origin v0.1.1
+node scripts/validate-release.cjs v1.0.0
+git tag -a v1.0.0 -m "Release Dev Container Templates 1.0.0"
+git push origin v1.0.0
 ```
 
 4. Follow **Publish Dev Container Templates** under GitHub Actions.
@@ -149,7 +149,7 @@ For another release, increment all three metadata files and use a new tag. Do no
 For a retry after infrastructure or permission failures, rerun the original jobs or dispatch the workflow against the same tag with authenticated GitHub CLI:
 
 ```sh
-gh workflow run publish-templates.yaml --ref v0.1.1 --repo guionardo/devcontainer-templates
+gh workflow run publish-templates.yaml --ref v1.0.0 --repo guionardo/devcontainer-templates
 ```
 
 A manual run against `main` is rejected. If a fix changes template contents, create a new release instead.
@@ -158,7 +158,7 @@ A manual run against `main` is rejected. If a fix changes template contents, cre
 
 After a successful publication, the workflow retains **three package versions per package**, including the collection metadata package. The four package names remain; this policy limits their stored versions.
 
-Versions are OCI manifests, not individual tags. Aliases such as `latest`, `0`, `0.1`, and `0.1.1` can refer to one manifest and count as a single version. The policy selects the newest manifests by creation time, includes untagged metadata versions, and always preserves the manifest carrying `latest` within the three-version limit. If `latest` was moved to an older manifest, that manifest takes one of the three retained slots.
+Versions are OCI manifests, not individual tags. Aliases such as `latest`, `1`, `1.0`, and `1.0.0` can refer to one manifest and count as a single version. The policy selects the newest manifests by creation time, includes untagged metadata versions, and always preserves the manifest carrying `latest` within the three-version limit. If `latest` was moved to an older manifest, that manifest takes one of the three retained slots.
 
 Older versions are deleted with all tags pointing to them. Their exact-version installation URLs can stop working. Git tags, commits, and the versioned examples are not deleted, so historical source remains available. Installation examples in this documentation may refer to an older validation baseline; select a retained OCI version when installing from GHCR.
 

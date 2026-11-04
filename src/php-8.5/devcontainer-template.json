@@ -1,6 +1,6 @@
 {
   "id": "php-8.5",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "name": "PHP 8.5 + Apache",
   "description": "PHP 8.5 Apache development environment with Xdebug 3.",
   "platforms": [

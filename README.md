@@ -10,14 +10,14 @@ Reusable VS Code Dev Container templates for PHP 5.1.6, 5.4, and 8.5, with Apach
 
 All three published `0.1.0` templates passed manual HTTP, breakpoint, variable inspection, step-over, and continue tests on Windows x64 with Docker Desktop Linux. See the [validation report](examples/vscode-debug/RESULTS.md).
 
-**Version status:** the published and manually tested OCI release is `0.1.0`. Source metadata is `0.1.1` for the English documentation and message update; it requires a new release tag before that OCI version can be installed.
+**Current release:** `1.0.0` consolidates the English catalog, versioned OCI publication, package retention, and minimal examples. The historical manual GUI validation belongs to `0.1.0`; see the [changelog](CHANGELOG.md) and the publication workflow for release details.
 
 ## Quick start with the official CLI
 
 Install Node.js/npm, Docker with Linux containers, VS Code, and the **Dev Containers** extension. From the root of an existing application:
 
 ```sh
-npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:0.1.0
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:1.0.0
 ```
 
 Replace `php-5.4` with `php-5.1.6` or `php-8.5`. No catalog clone is needed. The version after `:` is the **template version**, not the PHP version.
@@ -153,6 +153,7 @@ GHCR retains the latest **three versions per package**, including catalog metada
 
 ## Documentation
 
+- [Changelog](CHANGELOG.md)
 - [Documentation guide](docs/README.md)
 - [Installation, OCI packages, and tag-based releases](docs/distribution.md)
 - [Architecture and decisions](docs/architecture.md)

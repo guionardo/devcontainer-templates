@@ -2,7 +2,7 @@
 
 ## Validation status
 
-The published 0.1.0 baseline passed build, CLI, Xdebug loading, Apache, HTTP, and manual VS Code breakpoint/step-over tests on November 4, 2026 (Windows x64, Docker Desktop Linux amd64). Source 0.1.1 updates English content and metadata; the historical GUI result is attributed to 0.1.0.
+The published 0.1.0 baseline passed build, CLI, Xdebug loading, Apache, HTTP, and manual VS Code breakpoint/step-over tests on November 4, 2026 (Windows x64, Docker Desktop Linux amd64). Release 1.0.0 consolidates the English catalog and release automation; the historical GUI result is attributed to 0.1.0.
 
 ## Editor and runtime
 

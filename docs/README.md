@@ -17,7 +17,7 @@ Start with the [repository README](../README.md) to choose a runtime and apply a
 
 ## Versions and evidence
 
-Published OCI release `0.1.0` was manually tested on November 4, 2026. Source metadata is `0.1.1` for the English content update, pending its own release tag.
+The catalog milestone is `1.0.0`; all three template metadata files use that version. The earlier OCI release `0.1.0` was manually tested on November 4, 2026. See the [changelog](../CHANGELOG.md) for the consolidated release.
 
 The example runtime configuration comes from `0.1.0`. Example identifiers and annotations have since been translated; the report maps the current English identifiers to the names in the original debugger captures. Historical observations are not presented as a new manual debugger run.
 
