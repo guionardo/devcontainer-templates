@@ -26,7 +26,8 @@
 - [x] Automatizar validação de configuração e do instalador em CI.
 - [ ] Automatizar builds e testes HTTP das imagens em CI.
 - [x] Preparar instalador shell com backup e documentação.
-- [x] Preparar workflow manual de publicação OCI no GHCR.
+- [x] Automatizar publicação OCI por tags com validação das versões.
+- [x] Documentar aplicação via npx para os três templates.
 - [ ] Executar a primeira publicação dos templates versionados no GHCR.
 - [x] Documentar aplicação dos templates em repositórios externos.
 

@@ -10,7 +10,19 @@ Configurações reutilizáveis para desenvolver projetos PHP existentes no VS Co
 
 Os builds, a execução CLI, o carregamento do Xdebug, a configuração Apache e a resposta HTTP foram validados em Docker Desktop Linux amd64. A abertura no VS Code e os breakpoints ainda precisam de validação. Consulte [os resultados](tests/RESULTS.md).
 
-## Instalação rápida no projeto existente
+## Instalação com npx (pacote OCI)
+
+Com Node.js/npm instalado, execute na raiz do projeto (PowerShell, Git Bash, WSL, Linux ou macOS):
+
+```powershell
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:0.1.0
+```
+
+Escolha `php-5.1.6`, `php-5.4` ou `php-8.5`. A versão `0.1.0` é a versão do template e precisa estar publicada no GHCR. O catálogo não precisa ser clonado. Revise arquivos existentes antes de aplicar; os backups do instalador shell não fazem parte da CLI oficial. Nos legados, configure o nome Compose e a porta em `.devcontainer/.env` conforme o passo 3 abaixo.
+
+Depois, execute **Dev Containers: Reopen in Container** no VS Code. Consulte os [exemplos para as três versões e o fluxo de publicação por tags](docs/distribution.md#distribuição-oficial-dev-container-templates-em-ocighcr).
+
+## Instalação com script shell no projeto existente
 
 No Git Bash, WSL, Linux ou macOS, entre na raiz do projeto e execute (requer Git e curl):
 
@@ -41,7 +53,7 @@ git clone https://github.com/guionardo/devcontainer-templates.git
 
 Escolha uma pasta em `src`: `php-5.1.6`, `php-5.4` ou `php-8.5`. Use a versão compatível com a aplicação; aplicar um template não converte o código PHP nem instala as dependências do projeto.
 
-Os templates podem ser aplicados pelo instalador acima ou por cópia dos arquivos. O workflow manual de publicação no GHCR está preparado; os pacotes ainda não foram publicados.
+Os templates podem ser aplicados pelo instalador acima ou por cópia dos arquivos. A publicação no GHCR é automatizada por tags Git `vMAJOR.MINOR.PATCH`, com versão correspondente nos três metadados. Consulte o workflow de publicação para confirmar as releases disponíveis.
 
 ## 3. Aplicar em um projeto existente
 
@@ -184,6 +196,6 @@ Atualizações deste catálogo não são aplicadas automaticamente aos projetos.
 
 PHP 5.1.6, PHP 5.4 e Debian Jessie estão fora de suporte; os ambientes legados destinam-se a desenvolvimento local isolado. O PHP 5.1.6 não habilita extensões MySQL no build atual; o PHP 5.4 inclui `mysql`, `mysqli` e `pdo_mysql`. Consulte o `NOTES.md` do template escolhido para os detalhes.
 
-As imagens usam tags e os arquivos-fonte históricos ainda precisam de checksums fixados. A publicação versionada no GHCR e a validação automatizada em CI estão no [roadmap](docs/roadmap.md).
+As imagens usam tags e os arquivos-fonte históricos ainda precisam de checksums fixados. A publicação por tags e a validação de configuração/instalador em CI estão implementadas. Builds PHP em CI e validação de breakpoints continuam no [roadmap](docs/roadmap.md).
 
 Referências: [Dev Containers no VS Code](https://code.visualstudio.com/docs/devcontainers/containers), [Dev Container Templates](https://containers.dev/implementors/templates/) e [requisitos Linux](https://code.visualstudio.com/docs/remote/linux).

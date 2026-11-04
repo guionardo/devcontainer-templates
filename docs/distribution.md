@@ -54,28 +54,86 @@ Depois da instalação, abra a raiz do projeto no VS Code e execute **Dev Contai
 
 ## Distribuição oficial: Dev Container Templates em OCI/GHCR
 
-O formato padrão é um template com `devcontainer-template.json` e `.devcontainer/devcontainer.json`, empacotado como artefato OCI. A estrutura `src/php-*` deste catálogo segue esse formato. A [especificação](https://containers.dev/implementors/templates/) define metadados e versões; a [CLI oficial](https://github.com/devcontainers/cli/blob/main/docs/templates/apply.md) aplica o pacote a uma pasta local.
+O formato padrão é um template com `devcontainer-template.json` e `.devcontainer/devcontainer.json`, empacotado como artefato OCI. A estrutura `src/php-*` deste catálogo segue esse formato. A [CLI oficial](https://github.com/devcontainers/cli/blob/main/docs/templates/apply.md) baixa o pacote e aplica a configuração em um projeto existente.
 
-O workflow **Publish Dev Container Templates** está preparado em `.github/workflows/publish-templates.yaml`. Ele é manual: enviar código ao GitHub não publica os pacotes automaticamente.
+### Aplicar usando npx
 
-Para publicar pela primeira vez:
+Instale Node.js/npm, entre na raiz do projeto e escolha **apenas um** dos comandos abaixo. Os comandos funcionam no PowerShell, Git Bash, WSL, Linux e macOS. A versão OCI indicada deve estar publicada no GHCR e acessível à sua conta (ou pública para download sem autenticação).
 
-1. Conclua as validações desejadas e confira `version` no `devcontainer-template.json` de cada template (atualmente `0.1.0`).
-2. No GitHub, abra **Actions → Publish Dev Container Templates → Run workflow**, selecionando `main`.
-3. Aguarde o workflow concluir. Ele usa `GITHUB_TOKEN` com `packages: write`, sem precisar cadastrar um token pessoal no repositório.
-4. Confira os pacotes em [Packages do mantenedor](https://github.com/guionardo?tab=packages). Para distribuição pública sem autenticação, configure a visibilidade dos pacotes e do pacote de metadados como **public**, conforme as permissões disponíveis.
-5. Para novas publicações, incremente a versão dos templates alterados; não reutilize uma versão já publicada.
+PHP 5.1.6:
 
-Após uma publicação bem-sucedida e os ajustes de visibilidade, o uso padrão será, na raiz do projeto:
+```powershell
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.1.6:0.1.0
+```
+
+PHP 5.4:
 
 ```powershell
 npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:0.1.0
 ```
 
-Troque o identificador por `php-5.1.6` ou `php-8.5`. Esse comando requer Node.js/npm e acesso ao pacote. Use uma branch do projeto e revise arquivos existentes antes de aplicá-lo: os backups e a preservação de arquivos descritos acima pertencem ao nosso instalador, não são garantias da CLI oficial.
+PHP 8.5:
 
-Depois, abra no VS Code e use **Dev Containers: Reopen in Container**. O VS Code consome os arquivos locais resultantes; não é necessário criar uma extensão própria. Ter o repositório GitHub ou o pacote GHCR não garante que o template apareça automaticamente na lista pública de templates do VS Code. A seleção por identificador depende do suporte da versão da extensão; a CLI é o caminho explícito documentado aqui.
+```powershell
+npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-8.5:0.1.0
+```
 
-Publicar um template OCI distribui configurações, não imagens PHP pré-compiladas. Com os Dockerfiles atuais, o primeiro uso ainda constrói as imagens localmente. Publicar imagens pré-compiladas seria uma etapa adicional.
+Para outro projeto, substitua `--workspace-folder .` por `--workspace-folder "C:\dev\minha-aplicacao"`, por exemplo. Não é necessário clonar o catálogo. A versão após `:` é a versão do template, não a versão do PHP nem a versão da CLI baixada pelo npx.
+
+Use uma branch do projeto e revise configurações existentes antes de aplicar. Os backups e a preservação de arquivos oferecidos pelo instalador shell não são garantias da CLI oficial. Para atualizar uma configuração já personalizada, prefira o instalador com `--update` ou aplique o pacote OCI em uma pasta temporária e mescle as diferenças.
+
+Nos legados, configure `.devcontainer/.env` com `COMPOSE_PROJECT_NAME` exclusivo e a porta `PHP_HTTP_PORT`, conforme o README. A CLI copia o template, mas não gera esses valores por projeto como faz o instalador shell.
+
+Depois, abra a raiz do projeto no VS Code e execute **Dev Containers: Reopen in Container**. Após atualizar arquivos de um ambiente existente, execute **Dev Containers: Rebuild Container**. A aplicação do pacote não inicia containers nem instala dependências da aplicação automaticamente.
+
+### Publicação automática por tags Git
+
+O workflow [Publish Dev Container Templates](../.github/workflows/publish-templates.yaml) é disparado ao enviar uma tag `vMAJOR.MINOR.PATCH`, por exemplo `v0.1.0`. Um push comum em `main` executa as verificações aplicáveis, mas não publica pacotes.
+
+Este catálogo usa **versão única por release**: a tag `v0.1.0` exige `"version": "0.1.0"` no `devcontainer-template.json` dos três templates. A versão é independente dos runtimes PHP. Nas próximas releases, incremente os três metadados juntos, mesmo quando apenas um template tiver alterações.
+
+Procedimento para o mantenedor:
+
+1. Atualize a versão nos três arquivos `src/php-*/devcontainer-template.json` e revise a documentação. Para a primeira release, os arquivos já usam `0.1.0`.
+2. Faça commit e envie as alterações para `main`. Aguarde o workflow de validação passar.
+3. Atualize o checkout local e confira o commit que deseja publicar. Para a primeira release:
+
+```powershell
+git switch main
+git pull --ff-only origin main
+node scripts/validate-release.cjs v0.1.0
+git tag -a v0.1.0 -m "Release Dev Container Templates 0.1.0"
+git push origin v0.1.0
+```
+
+4. Acompanhe o workflow na aba **Actions**. A tag precisa apontar para um commit do histórico de `main`; o workflow recusa referências de branch, tags incompletas, prereleases e versões diferentes dos metadados. Os testes do instalador, o validador de release, os JSONs e os arquivos Compose são verificados antes da publicação. Builds PHP e breakpoints não são testados por esse workflow.
+5. Confira os pacotes em [Packages do mantenedor](https://github.com/guionardo?tab=packages). Para download público sem autenticação, configure a visibilidade dos três templates e do pacote de metadados como **public**, conforme as permissões disponíveis.
+6. Teste um dos comandos `npx` acima em uma pasta temporária vazia antes de distribuir a release à equipe.
+
+O workflow usa `GITHUB_TOKEN` com `packages: write`, sem um token pessoal cadastrado no repositório. A ação não cria tags adicionais no Git; a tag enviada pelo mantenedor é o gatilho de release. As tags OCI são gerenciadas pela ação oficial conforme os metadados; os exemplos fixam a versão completa para tornar explícita a release escolhida.
+
+Para a próxima release, use, por exemplo, `0.1.1` nos três metadados e a tag Git `v0.1.1`. Não mova tags publicadas nem reutilize uma versão para conteúdo diferente. Pacotes com uma versão já existente podem ser ignorados pela ferramenta de publicação.
+
+O gatilho manual é mantido para repetir uma publicação da mesma tag após corrigir uma falha de infraestrutura/permissão. Use **Re-run jobs** na execução original ou, com GitHub CLI autenticado:
+
+```powershell
+gh workflow run publish-templates.yaml --ref v0.1.0 --repo guionardo/devcontainer-templates
+```
+
+Executar manualmente com `main` é recusado. Se a correção alterar os arquivos do template, prepare uma nova versão e uma nova tag.
+
+### Tags Git e instalador shell
+
+Após a tag existir, o instalador também pode aplicar exatamente essa release:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/v0.1.0/scripts/install.sh | sh -s -- --php 5.4 --ref v0.1.0
+```
+
+Nesse caso, tanto o script quanto o catálogo vêm da mesma tag Git. O pacote equivalente usa `:0.1.0` no endereço GHCR, sem o prefixo `v`.
+
+O VS Code consome os arquivos locais resultantes; não é necessário criar uma extensão própria. Ter o repositório GitHub ou o pacote GHCR não garante que o template apareça automaticamente na lista pública de templates do VS Code. A CLI é o caminho explícito documentado aqui.
+
+Publicar um template OCI distribui configurações, não imagens PHP pré-compiladas. Com os Dockerfiles atuais, o primeiro uso ainda constrói as imagens localmente.
 
 Fontes oficiais: [template-starter](https://github.com/devcontainers/template-starter), [ação de publicação](https://github.com/devcontainers/action) e [especificação de distribuição](https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainer-templates-distribution.md).

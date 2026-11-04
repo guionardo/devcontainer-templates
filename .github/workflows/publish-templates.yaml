@@ -1,6 +1,10 @@
 name: Publish Dev Container Templates
+run-name: Publish Dev Container Templates (${{ github.ref_name }})
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -11,8 +15,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require a version tag from main
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          test "$REF_TYPE" = tag || { echo 'Selecione uma tag vMAJOR.MINOR.PATCH; main não publica pacotes.'; exit 1; }
+          git merge-base --is-ancestor HEAD origin/main || { echo 'A tag deve apontar para um commit do histórico de main.'; exit 1; }
+          node scripts/validate-release.cjs "$RELEASE_TAG"
+      - name: Check release validator and installer
+        run: |
+          node --test tests/release.test.cjs
+          sh -n scripts/install.sh
+          sh tests/installer.sh "$GITHUB_WORKSPACE"
+      - name: Validate JSON and Compose
+        run: |
+          node -e 'const fs=require("fs"),p=require("path");function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const f=p.join(d,e.name);if(e.isDirectory())walk(f);else if(f.endsWith(".json"))JSON.parse(fs.readFileSync(f,"utf8"));}}walk("src");'
+          docker compose -f src/php-5.1.6/.devcontainer/compose.yaml config --quiet
+          docker compose -f src/php-5.4/.devcontainer/compose.yaml config --quiet
+
   publish:
-    if: github.ref == 'refs/heads/main'
+    needs: validate
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,5 +54,8 @@ jobs:
           publish-templates: 'true'
           base-path-to-templates: './src'
           generate-docs: 'false'
+          disable-repo-tagging: 'true'
+          oci-registry-for-templates: ghcr.io
+          templates-namespace: ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
