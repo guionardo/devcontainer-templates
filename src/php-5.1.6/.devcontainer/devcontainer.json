@@ -1,0 +1,23 @@
+{
+  "name": "PHP 5.1.6 + Apache",
+  "workspaceFolder": "/var/www/html",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "xdebug.php-debug"
+      ],
+      "settings": {
+        "php.validate.enable": false
+      }
+    }
+  },
+  "remoteUser": "vscode",
+  "shutdownAction": "stopCompose",
+  "dockerComposeFile": "compose.yaml",
+  "service": "editor",
+  "runServices": [
+    "editor",
+    "php"
+  ],
+  "overrideCommand": false
+}

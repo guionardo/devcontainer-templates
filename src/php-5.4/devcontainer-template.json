@@ -1,0 +1,14 @@
+{
+  "id": "php-5.4",
+  "version": "0.1.0",
+  "name": "PHP 5.4.45 + Apache",
+  "description": "Legacy PHP runtime with a modern VS Code editor sidecar and Xdebug 2.",
+  "platforms": [
+    "PHP"
+  ],
+  "keywords": [
+    "php",
+    "apache",
+    "xdebug"
+  ]
+}

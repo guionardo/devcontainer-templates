@@ -10,7 +10,9 @@ Este repositório distribui configurações reutilizáveis de ambiente de desenv
 - `php-5.4`: ambiente isolado para manter e depurar aplicações legadas.
 - `php-8.5`: ambiente para desenvolver e depurar a versão modernizada.
 
-Cada template terá metadados `devcontainer-template.json`, `.devcontainer/devcontainer.json` e, quando necessário, Dockerfile/scripts. A configuração é aplicada no **repositório da aplicação**, que continua dono de seu código, dependências e testes de regressão.
+Cada template contém metadados `devcontainer-template.json`, `.devcontainer/devcontainer.json` e, quando necessário, Dockerfile/scripts. A configuração é aplicada no **repositório da aplicação**, que continua dono de seu código, dependências e testes de regressão.
+
+Os templates usam Apache conforme as configurações existentes. Os legados conectam o VS Code a um editor Bookworm separado do runtime Jessie; veja `decisions/ADR-003-editor-legado.md`.
 
 ## Validação do catálogo
 

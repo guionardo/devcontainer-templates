@@ -1,3 +1,7 @@
+FROM curlimages/curl:8.12.1 AS downloads
+WORKDIR /tmp
+RUN curl -fL --retry 3 https://museum.php.net/php5/php-5.1.6.tar.gz -o php.tar.gz && curl -fL --retry 3 https://xdebug.org/files/xdebug-2.0.0.tgz -o xdebug.tgz
+
 # PHP 5.1.6 is end-of-life; this legacy runtime is isolated in its own service.
 FROM debian:jessie-slim AS builder
 
@@ -17,8 +21,8 @@ RUN apt-get update && apt-get install -y --force-yes \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/local/src
-RUN wget --no-check-certificate https://museum.php.net/php5/php-5.1.6.tar.gz && \
-    tar -zxf php-5.1.6.tar.gz
+COPY --from=downloads /tmp/php.tar.gz /usr/local/src/php-5.1.6.tar.gz
+RUN tar -zxf php-5.1.6.tar.gz
 
 WORKDIR /usr/local/src/php-5.1.6
 RUN ./configure \
@@ -33,7 +37,7 @@ RUN ./configure \
 
 # Build the PHP 5.1-compatible legacy Xdebug extension against this exact PHP ABI.
 WORKDIR /usr/local/src
-COPY xdebug-2.0.0.tgz /usr/local/src/xdebug-2.0.0.tgz
+COPY --from=downloads /tmp/xdebug.tgz /usr/local/src/xdebug-2.0.0.tgz
 RUN tar -zxf xdebug-2.0.0.tgz && \
     cd xdebug-2.0.0 && \
     phpize && ./configure --enable-xdebug && make && make install && \
@@ -56,12 +60,13 @@ RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
     libssl1.0.0 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /usr/local/bin/php /usr/local/bin/php
+COPY --from=builder /usr/local/src/php-5.1.6/sapi/cli/php /usr/local/bin/php
+COPY --from=builder /usr/local/src/php-5.1.6/sapi/cgi/php /usr/local/bin/php-cgi
 COPY --from=builder /usr/local/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so
 RUN mkdir -p /usr/lib/cgi-bin && \
-    cp /usr/local/bin/php /usr/lib/cgi-bin/php-cgi && \
+    cp /usr/local/bin/php-cgi /usr/lib/cgi-bin/php-cgi && \
     chmod 0755 /usr/lib/cgi-bin/php-cgi && \
-    printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so\nxdebug.remote_enable=1\nxdebug.remote_autostart=0\nxdebug.remote_connect_back=0\nxdebug.remote_host=host.docker.internal\nxdebug.remote_port=9000\n' >> /usr/local/lib/php.ini
+    printf '\nzend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so\nxdebug.remote_enable=1\nxdebug.remote_autostart=1\nxdebug.remote_connect_back=0\nxdebug.remote_host=editor\nxdebug.remote_port=9000\n' >> /usr/local/lib/php.ini
 
 # PHP 5.1's Apache module is incompatible with Apache 2.4; use CGI instead.
 RUN a2dismod mpm_event && a2enmod mpm_prefork cgi actions && \

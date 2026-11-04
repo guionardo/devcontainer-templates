@@ -1,3 +1,7 @@
+FROM curlimages/curl:8.12.1 AS downloads
+WORKDIR /tmp
+RUN curl -fL --retry 3 https://museum.php.net/php5/php-5.4.45.tar.gz -o php.tar.gz && curl -fL --retry 3 https://xdebug.org/files/xdebug-2.4.1.tgz -o xdebug.tgz
+
 # STEP 1: Use Debian Jessie
 FROM debian:jessie-slim
 
@@ -20,8 +24,8 @@ RUN apt-get update && apt-get install -y --force-yes \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/local/src
-RUN wget --no-check-certificate https://www.php.net/distributions/php-5.4.45.tar.gz && \
-    tar -zxf php-5.4.45.tar.gz
+COPY --from=downloads /tmp/php.tar.gz /usr/local/src/php-5.4.45.tar.gz
+RUN tar -zxf php-5.4.45.tar.gz
 
 WORKDIR /usr/local/src/php-5.4.45
 RUN ./configure \
@@ -35,11 +39,11 @@ RUN ./configure \
 
 # Xdebug 2.4.1 is the final compatible branch for PHP 5.4.
 WORKDIR /usr/local/src
-COPY xdebug-2.4.1.tgz /usr/local/src/xdebug-2.4.1.tgz
+COPY --from=downloads /tmp/xdebug.tgz /usr/local/src/xdebug-2.4.1.tgz
 RUN tar -zxf xdebug-2.4.1.tgz && \
     cd xdebug-2.4.1 && \
     phpize && ./configure --enable-xdebug && make && make install && \
-    printf '\nzend_extension=%s/xdebug.so\nxdebug.remote_enable=1\nxdebug.remote_autostart=0\nxdebug.remote_connect_back=0\nxdebug.remote_host=host.docker.internal\nxdebug.remote_port=9000\n' "$(php-config --extension-dir)" >> /usr/local/lib/php.ini
+    printf '\nzend_extension=%s/xdebug.so\nxdebug.remote_enable=1\nxdebug.remote_autostart=1\nxdebug.remote_connect_back=0\nxdebug.remote_host=editor\nxdebug.remote_port=9000\n' "$(php-config --extension-dir)" >> /usr/local/lib/php.ini
 
 # PHP 5.4's non-thread-safe Apache module requires Apache's prefork MPM.
 RUN a2dismod mpm_event && a2enmod mpm_prefork && \

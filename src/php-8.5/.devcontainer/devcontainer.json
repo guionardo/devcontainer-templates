@@ -1,0 +1,25 @@
+{
+  "name": "PHP 8.5 + Apache",
+  "workspaceFolder": "/var/www/html",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "xdebug.php-debug"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php"
+      }
+    }
+  },
+  "remoteUser": "root",
+  "shutdownAction": "stopContainer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/var/www/html,type=bind",
+  "forwardPorts": [
+    80
+  ],
+  "overrideCommand": false
+}

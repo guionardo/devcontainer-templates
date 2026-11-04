@@ -1,0 +1,16 @@
+services:
+  editor:
+    image: mcr.microsoft.com/devcontainers/base:bookworm
+    command: sleep infinity
+    volumes:
+      - ..:/var/www/html
+  php:
+    image: local/devcontainer-php-5.4:0.1.0
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:${PHP_HTTP_PORT:-8054}:80"
+    volumes:
+      - ..:/var/www/html

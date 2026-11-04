@@ -1,0 +1,14 @@
+{
+  "id": "php-8.5",
+  "version": "0.1.0",
+  "name": "PHP 8.5 + Apache",
+  "description": "PHP 8.5 Apache development environment with Xdebug 3.",
+  "platforms": [
+    "PHP"
+  ],
+  "keywords": [
+    "php",
+    "apache",
+    "xdebug"
+  ]
+}
