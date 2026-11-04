@@ -16,6 +16,7 @@
 - [x] Validate breakpoints, local variables, F10, and continuation in VS Code.
 - [x] Add minimal projects, repeatable instructions, and recorded results.
 - [x] Translate maintained content to English and review documentation.
+- [x] Retain three GHCR versions per package after successful publication.
 - [x] Prepare a draft article based on the implementation and tests.
 
 ## Next

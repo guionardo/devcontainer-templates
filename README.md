@@ -147,6 +147,10 @@ PHP 5.1.6 has no MySQL driver enabled in the current build; PDO core alone does 
 
 Base images use tags and historical source archives still need pinned checksums. Passing tests does not establish fully reproducible builds.
 
+## Package retention
+
+GHCR retains the latest **three versions per package**, including catalog metadata, after a successful publication. Older exact-version URLs may become unavailable. Aliases pointing to one OCI manifest count as one version; Git history and examples remain available. See [retention and manual cleanup](docs/distribution.md#package-retention).
+
 ## Documentation
 
 - [Documentation guide](docs/README.md)

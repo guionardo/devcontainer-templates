@@ -154,6 +154,22 @@ gh workflow run publish-templates.yaml --ref v0.1.1 --repo guionardo/devcontaine
 
 A manual run against `main` is rejected. If a fix changes template contents, create a new release instead.
 
+## Package retention
+
+After a successful publication, the workflow retains **three package versions per package**, including the collection metadata package. The four package names remain; this policy limits their stored versions.
+
+Versions are OCI manifests, not individual tags. Aliases such as `latest`, `0`, `0.1`, and `0.1.1` can refer to one manifest and count as a single version. The policy selects the newest manifests by creation time, includes untagged metadata versions, and always preserves the manifest carrying `latest` within the three-version limit. If `latest` was moved to an older manifest, that manifest takes one of the three retained slots.
+
+Older versions are deleted with all tags pointing to them. Their exact-version installation URLs can stop working. Git tags, commits, and the versioned examples are not deleted, so historical source remains available. Installation examples in this documentation may refer to an older validation baseline; select a retained OCI version when installing from GHCR.
+
+The cleanup job runs only after publication succeeds. It inventories all four packages before any deletion and fails without deleting if a package cannot be read or its version metadata is invalid. It does not roll back an already published release if cleanup later fails.
+
+To inspect or apply the policy separately, open **Actions → Clean up old GHCR package versions → Run workflow**, choose `main`, and leave `dry_run` enabled for a preview. Disable it to apply deletion. Publication and manual cleanup share one concurrency group to prevent overlapping operations.
+
+The workflow uses `actions/github-script@v8` on Node.js 24. Its `GITHUB_TOKEN` needs package admin access, in addition to workflow `packages: write`. Packages published by this repository's workflow normally grant that access; for older packages, check **Package settings → Manage Actions access** and assign this repository the Admin role if needed. GitHub can restrict deletion of heavily downloaded public versions; a cleanup failure is reported rather than silently claiming the policy was applied.
+
+Reference: [GitHub package deletion and permissions](https://docs.github.com/en/packages/learn-github-packages/deleting-and-restoring-a-package).
+
 ## VS Code discovery
 
 VS Code uses the resulting local files. No custom extension is required to consume the templates through the CLI.

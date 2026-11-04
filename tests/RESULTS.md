@@ -48,3 +48,7 @@ The English update uses source template version `0.1.1`; the recorded manual GUI
 The translated release validator passed all four test cases. The translated installer passed its Linux container checks, including backup preservation and symbolic-link refusal. Each translated `index.php` passed syntax validation and executed in its matching PHP runtime, returning `Total: 45`.
 
 All 18 Markdown files were reviewed, local link targets and code fences were checked, and all 16 JSON files parsed successfully. These checks do not replace a new manual GUI test of the translated example identifiers.
+
+## Retention policy checks
+
+Eight automated checks cover three-version retention, alias counting, untagged metadata, latest preservation, invalid metadata, dry-run behavior, scoped deletion IDs, read-failure handling, and organization endpoints. These tests use simulated API responses; the manual workflow provides a live preview of the actual packages and permissions.

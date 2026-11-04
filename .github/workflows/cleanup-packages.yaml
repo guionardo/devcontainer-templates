@@ -1,0 +1,32 @@
+name: Clean up old GHCR package versions
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview only; disable to delete versions beyond the latest three'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+# Serialize manual cleanup with publication and its automatic cleanup.
+concurrency:
+  group: publish-devcontainer-templates
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/github-script@v8
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        with:
+          script: |
+            const { prunePackages } = require('./scripts/prune-package-versions.cjs');
+            return await prunePackages({ github, context, core, dryRun: process.env.DRY_RUN !== 'false' });

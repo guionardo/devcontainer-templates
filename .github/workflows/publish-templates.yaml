@@ -31,7 +31,7 @@ jobs:
           node scripts/validate-release.cjs "$RELEASE_TAG"
       - name: Check release validator and installer
         run: |
-          node --test tests/release.test.cjs
+          node --test tests/release.test.cjs tests/retention.test.cjs
           sh -n scripts/install.sh
           sh tests/installer.sh "$GITHUB_WORKSPACE"
       - name: Validate JSON and Compose
@@ -59,3 +59,18 @@ jobs:
           templates-namespace: ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Keep the latest three versions of each GHCR package
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { prunePackages } = require('./scripts/prune-package-versions.cjs');
+            return await prunePackages({ github, context, core, dryRun: false });
