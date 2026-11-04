@@ -23,8 +23,11 @@
 
 ## Fase 3 — Distribuição
 
-- [ ] Automatizar validação em CI.
-- [ ] Publicar templates versionados no GHCR.
+- [x] Automatizar validação de configuração e do instalador em CI.
+- [ ] Automatizar builds e testes HTTP das imagens em CI.
+- [x] Preparar instalador shell com backup e documentação.
+- [x] Preparar workflow manual de publicação OCI no GHCR.
+- [ ] Executar a primeira publicação dos templates versionados no GHCR.
 - [x] Documentar aplicação dos templates em repositórios externos.
 
 Fora do escopo: código de aplicações, migração de regras de negócio e suítes de regressão das aplicações.

@@ -10,6 +10,21 @@ Configurações reutilizáveis para desenvolver projetos PHP existentes no VS Co
 
 Os builds, a execução CLI, o carregamento do Xdebug, a configuração Apache e a resposta HTTP foram validados em Docker Desktop Linux amd64. A abertura no VS Code e os breakpoints ainda precisam de validação. Consulte [os resultados](tests/RESULTS.md).
 
+## Instalação rápida no projeto existente
+
+No Git Bash, WSL, Linux ou macOS, entre na raiz do projeto e execute (requer Git e curl):
+
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh | sh -s -- --php 5.4 --smoke
+```
+
+Use `--php 5.1`, `--php 5.4` ou `--php 8.5`. O script instala a configuração; depois execute **Dev Containers: Reopen in Container** no VS Code. No Windows, o comando acima é para Git Bash/WSL, não PowerShell.
+
+Se o projeto já tem `.devcontainer`, o instalador recusa a sobrescrita. Acrescente `--update` para atualizar os arquivos conhecidos com backup. O `.env`, o `launch.json` existente e os arquivos personalizados são preservados; alterações próprias no Dockerfile/devcontainer.json devem ser reaplicadas a partir do backup. O novo debug fica em `.devcontainer/launch.template.json` para mescla manual.
+
+Veja [instalação, atualização e distribuição oficial](docs/distribution.md) para baixar e revisar o script antes de executar, fixar uma revisão, escolher outro diretório e publicar templates OCI no GHCR. Os passos abaixo também permitem a instalação por cópia manual e detalham o uso do ambiente.
+
 ## 1. Preparar a máquina
 
 Instale Git, VS Code, Docker Desktop configurado para containers Linux e a extensão **Dev Containers** (`ms-vscode-remote.remote-containers`). Mantenha o Docker Desktop iniciado.
@@ -26,7 +41,7 @@ git clone https://github.com/guionardo/devcontainer-templates.git
 
 Escolha uma pasta em `src`: `php-5.1.6`, `php-5.4` ou `php-8.5`. Use a versão compatível com a aplicação; aplicar um template não converte o código PHP nem instala as dependências do projeto.
 
-O uso atual é por cópia dos arquivos. Os templates ainda não estão publicados no GHCR.
+Os templates podem ser aplicados pelo instalador acima ou por cópia dos arquivos. O workflow manual de publicação no GHCR está preparado; os pacotes ainda não foram publicados.
 
 ## 3. Aplicar em um projeto existente
 

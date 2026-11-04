@@ -13,3 +13,7 @@ JSONs parseados e os dois arquivos Compose validados por docker compose config. 
 Não validado: integração visual do VS Code, breakpoint DBGp, requisitos de banco de aplicações e build sem cache das dependências apt. Alguns estágios apt foram reaproveitados do cache local. Fontes PHP e Xdebug foram baixadas e compiladas no teste.
 
 A mesclagem pendente foi concluída na preparação da publicação. A remoção local preexistente de samples foi preservada; os exemplos antigos continuam no histórico Git e os arquivos de trabalho originais permanecem na pasta docker, fora deste catálogo.
+
+## Instalador — 2026-11-04
+
+Testado em Git Bash/Windows e em container Linux: instalação nas três versões, atualização com backup, preservação de código/.env/launch.json/arquivos personalizados, recusa de sobrescrita sem --update, caminhos com espaços e entradas inválidas. Symlinks reais foram testados em Linux; Git Bash desta máquina emula ln -s com cópia. Download Git por SHA e registro da revisão também foram validados. Estes testes não iniciam os ambientes PHP nem validam breakpoints.

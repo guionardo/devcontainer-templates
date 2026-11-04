@@ -1,0 +1,36 @@
+name: Validate template configuration and installer
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax and installer behavior
+        run: |
+          sh -n scripts/install.sh
+          sh -n tests/installer.sh
+          sh -n tests/download-installer.sh
+          sh tests/installer.sh "$GITHUB_WORKSPACE"
+      - name: Validate metadata and Compose
+        run: |
+          node -e 'const fs=require("fs"),p=require("path");function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const f=p.join(d,e.name);if(e.isDirectory())walk(f);else if(f.endsWith(".json"))JSON.parse(fs.readFileSync(f,"utf8"));}}walk("src");'
+          docker compose -f src/php-5.1.6/.devcontainer/compose.yaml config --quiet
+          docker compose -f src/php-5.4/.devcontainer/compose.yaml config --quiet
