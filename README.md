@@ -8,7 +8,11 @@ Configurações reutilizáveis para desenvolver projetos PHP existentes no VS Co
 | `php-5.4` | 5.4.45 | 2.4.1 | `http://localhost:8054` |
 | `php-8.5` | 8.5.12 | 3.5.3 | Porta 80 encaminhada pelo VS Code |
 
-Os builds, a execução CLI, o carregamento do Xdebug, a configuração Apache e a resposta HTTP foram validados em Docker Desktop Linux amd64. A abertura no VS Code e os breakpoints ainda precisam de validação. Consulte [os resultados](tests/RESULTS.md).
+Os builds, a execução CLI, o carregamento do Xdebug, a configuração Apache e a resposta HTTP foram validados em Docker Desktop Linux amd64. A abertura no VS Code, os breakpoints, a inspeção de variáveis e o passo com F10 também foram validados nas três versões. Consulte [os resultados](tests/RESULTS.md).
+
+## Projetos mínimos para testar execução e debug
+
+Os [três exemplos completos](examples/vscode-debug/README.md) incluem index.php, Dev Container e launch.json aplicados dos pacotes OCI 0.1.0. Abra um exemplo por janela do VS Code e siga o roteiro de breakpoint na linha 7, inspeção de variáveis e F10. O [relatório](examples/vscode-debug/RESULTS.md) registra o teste manual aprovado para PHP 5.1.6, 5.4.45 e 8.5.12.
 
 ## Instalação com npx (pacote OCI)
 
@@ -196,6 +200,6 @@ Atualizações deste catálogo não são aplicadas automaticamente aos projetos.
 
 PHP 5.1.6, PHP 5.4 e Debian Jessie estão fora de suporte; os ambientes legados destinam-se a desenvolvimento local isolado. O PHP 5.1.6 não habilita extensões MySQL no build atual; o PHP 5.4 inclui `mysql`, `mysqli` e `pdo_mysql`. Consulte o `NOTES.md` do template escolhido para os detalhes.
 
-As imagens usam tags e os arquivos-fonte históricos ainda precisam de checksums fixados. A publicação por tags e a validação de configuração/instalador em CI estão implementadas. Builds PHP em CI e validação de breakpoints continuam no [roadmap](docs/roadmap.md).
+As imagens usam tags e os arquivos-fonte históricos ainda precisam de checksums fixados. A publicação por tags e a validação de configuração/instalador em CI estão implementadas. Builds PHP em CI e automação dos testes de debug continuam no [roadmap](docs/roadmap.md); os breakpoints já foram validados manualmente nos exemplos.
 
 Referências: [Dev Containers no VS Code](https://code.visualstudio.com/docs/devcontainers/containers), [Dev Container Templates](https://containers.dev/implementors/templates/) e [requisitos Linux](https://code.visualstudio.com/docs/remote/linux).

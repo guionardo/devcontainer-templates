@@ -24,8 +24,8 @@ Verificar build do ambiente, versão do PHP, extensões necessárias, integraç�
 - Não assumir servidor HTTP, banco ou extensões sem levantamento.
 - Não compartilhar diretórios de dependências incompatíveis entre runtimes.
 
-## Questões em aberto
+## Validação e distribuição implementadas
 
-- Extensões e servidores HTTP necessários para cada versão.
-- Versões de Xdebug compatíveis e forma de integração ao VS Code.
-- Estratégia de publicação dos templates no GHCR.
+Os [exemplos mínimos](../examples/vscode-debug/README.md) registram execução e debug manual aprovados com Apache, Xdebug 2.0.0/2.4.1/3.5.3 e VS Code. Os exemplos ficam fora de src e não são publicados nos pacotes OCI. A [distribuição](distribution.md) usa GHCR, com publicação por tags Git.
+
+Requisitos adicionais de extensões e banco continuam sendo definidos por cada aplicação.

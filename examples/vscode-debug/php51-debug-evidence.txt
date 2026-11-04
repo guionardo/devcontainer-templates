@@ -1,0 +1,6 @@
+item da árvore (selectable) subtotal, value 50
+item da árvore (selectable) total, value 45
+item da árvore (selectable) desconto, value 5
+linha (selectable) Stack Frame calcularTotal, line 8, index.php
+linha (selectable) Stack Frame {main}, line 14, index.php
+text return $total;, debugging paused , reason step, index.php:8
