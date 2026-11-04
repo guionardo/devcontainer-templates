@@ -1,18 +1,21 @@
-# ADR-002 — Responsabilidade pelos testes de regressão
+# ADR-002: ownership of regression tests
 
-- Data: 2026-10-30
-- Status: Aceita (escopo revisado)
+- Date: 2026-10-30
+- Status: Accepted; repository scope clarified
 
-## Contexto
+## Context
 
-Os runtimes PHP 5.1.6 e 5.4 servem de referência para migração de aplicações para PHP 8.5. Este repositório, porém, é exclusivamente um catálogo de templates de ambiente.
+PHP 5.1.6 and PHP 5.4 runtimes can provide reference behavior during application modernization. This repository is an environment template catalog, not an application migration repository.
 
-## Decisão
+## Decision
 
-**Testes funcionais, fixtures de negócio e comparações de resultados pertencem aos repositórios das aplicações**, não a este repositório. Aqui serão mantidos apenas testes técnicos dos templates (build, runtime, extensões, integração com o VS Code e depuração), podendo incluir código PHP mínimo de exemplo para smoke tests.
+Application repositories own functional tests, business fixtures, and comparisons of business results.
 
-## Consequências
+This catalog contains technical environment checks: builds, runtime versions, extensions, HTTP execution, editor integration, and debugging. Minimal standalone PHP examples are allowed for smoke and breakpoint tests.
 
-- Templates desacoplados dos sistemas migrados.
-- Cada aplicação decide seu fluxo de migração e regressão.
-- O catálogo valida apenas a infraestrutura de desenvolvimento.
+## Consequences
+
+- Templates remain independent of application code and business data.
+- Each application chooses its migration and regression strategy.
+- Catalog validation establishes development environment behavior, not application correctness.
+- Recorded debugger demonstrations must state their environment and test boundaries.

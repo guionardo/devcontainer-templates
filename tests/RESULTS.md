@@ -1,25 +1,50 @@
-# Validação — 2026-11-04
+# Validation results
 
-Docker Desktop 4.97.0 / Engine 29.9.2, Linux amd64.
+Tests recorded on November 4, 2026, using Docker Desktop 4.97.0 / Engine 29.9.2, Linux amd64.
+
+## Runtime and HTTP checks
 
 | Template | PHP | Xdebug | Build / CLI / Apache / HTTP |
 | --- | --- | --- | --- |
-| php-5.1.6 | 5.1.6 | 2.0.0 | OK |
-| php-5.4 | 5.4.45 | 2.4.1 | OK |
-| php-8.5 | 8.5.12 | 3.5.3 | OK |
+| php-5.1.6 | 5.1.6 | 2.0.0 | Passed |
+| php-5.4 | 5.4.45 | 2.4.1 | Passed |
+| php-8.5 | 8.5.12 | 3.5.3 | Passed |
 
-JSONs parseados e os dois arquivos Compose validados por docker compose config. O script verify.sh confere módulos, sintaxe do exemplo, configuração Apache e resposta HTTP PHP com versão e Xdebug presentes. Executado em containers temporários com os diretórios tests montado em /checks-scripts e src/<template> em /checks.
+The smoke check lists modules, validates the example's syntax and Apache configuration, and confirms an HTTP response with PHP and Xdebug versions. The build tests used some cached Debian dependency layers; PHP and Xdebug sources were downloaded and compiled during the original validation.
 
-A integração visual do VS Code e os breakpoints DBGp foram validados posteriormente, conforme a seção abaixo. Não validado: requisitos de banco de aplicações e build sem cache das dependências apt. Alguns estágios apt foram reaproveitados do cache local. Fontes PHP e Xdebug foram baixadas e compiladas no teste.
+Source checksums, fully pinned image digests, clean dependency installation, and application database requirements remain outside the completed verification.
 
-A mesclagem pendente foi concluída na preparação da publicação. A remoção local preexistente de samples foi preservada; os exemplos antigos continuam no histórico Git e os arquivos de trabalho originais permanecem na pasta docker, fora deste catálogo.
+## Installer checks
 
-## Instalador — 2026-11-04
+Tested on Git Bash/Windows and in a temporary Linux container:
 
-Testado em Git Bash/Windows e em container Linux: instalação nas três versões, atualização com backup, preservação de código/.env/launch.json/arquivos personalizados, recusa de sobrescrita sem --update, caminhos com espaços e entradas inválidas. Symlinks reais foram testados em Linux; Git Bash desta máquina emula ln -s com cópia. Download Git por SHA e registro da revisão também foram validados. Estes testes não iniciam os ambientes PHP nem validam breakpoints.
+- Installation for all three runtime selections.
+- Refusal to overwrite without `--update`.
+- Backup creation and preservation of code, `.env`, `launch.json`, and custom files.
+- Paths containing spaces and rejection of invalid inputs.
+- Symbolic-link refusal on Linux. The local Git Bash environment emulated `ln -s` with a copy, so this scenario was explicitly skipped there.
+- Download by a fixed Git SHA and recording of the selected revision.
 
-## VS Code e breakpoints — 2026-11-04
+A published `curl | sh` invocation was also tested against a fixed commit.
 
-Os três templates OCI 0.1.0 foram aplicados a projetos mínimos e abertos no VS Code 1.143.1. Em todos, o teste HTTP parou em index.php:7, mostrou subtotal=50 e desconto=5; F10 avançou para a linha 8 com total=45 e F5 concluiu a resposta. A extensão PHP Debug 1.40.2 foi instalada automaticamente.
+## VS Code breakpoints
 
-Veja [projetos e instruções](../examples/vscode-debug/README.md) e [relatório com evidências](../examples/vscode-debug/RESULTS.md). Esta verificação foi manual e não é executada pelo CI.
+Published OCI templates `0.1.0` were downloaded into three minimal projects and opened in VS Code 1.143.1. PHP Debug 1.40.2 was installed automatically.
+
+All three projects paused at `index.php:7`, displayed subtotal 50 and discount 5, stepped to line 8 with total 45, and completed their HTTP response after continuing.
+
+See [examples and instructions](../examples/vscode-debug/README.md) and the [detailed report](../examples/vscode-debug/RESULTS.md). The GUI verification was manual; CI does not repeat it.
+
+The English revision updates example identifiers and messages without changing the calculation or breakpoint line numbers. Historical debug captures retain their original identifiers, with an explicit mapping in the report.
+
+## Automated checks
+
+The validation workflow checks installer behavior, release rules, JSON, and Compose configurations for templates and examples. It does not claim to build runtime images or operate the VS Code GUI.
+
+The English update uses source template version `0.1.1`; the recorded manual GUI validation remains attributed to `0.1.0`.
+
+## English revision checks
+
+The translated release validator passed all four test cases. The translated installer passed its Linux container checks, including backup preservation and symbolic-link refusal. Each translated `index.php` passed syntax validation and executed in its matching PHP runtime, returning `Total: 45`.
+
+All 18 Markdown files were reviewed, local link targets and code fences were checked, and all 16 JSON files parsed successfully. These checks do not replace a new manual GUI test of the translated example identifiers.

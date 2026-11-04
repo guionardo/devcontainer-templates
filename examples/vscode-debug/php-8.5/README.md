@@ -1,9 +1,9 @@
-# Exemplo mínimo — php-8.5
+# Minimal example: php-8.5
 
-Snapshot do template OCI `ghcr.io/guionardo/devcontainer-templates/php-8.5:0.1.0`, aplicado e validado em 04/11/2026.
+Runtime configuration was applied from OCI template ghcr.io/guionardo/devcontainer-templates/php-8.5:0.1.0 and manually tested on November 4, 2026. Code identifiers and annotations have since been translated; see the report for the historical identifier mapping.
 
-Abra **esta pasta** no VS Code e execute **Dev Containers: Reopen in Container**. Marque a linha 7 de `index.php` com F9 e inicie **Listen for Xdebug** com F5.
+Open this folder in VS Code and run **Dev Containers: Reopen in Container**. Set a breakpoint on index.php:7 with F9 and start **Listen for Xdebug** with F5.
 
-Acesse a porta 80 encaminhada pelo painel Ports, com `/index.php?XDEBUG_TRIGGER=1`. No breakpoint: subtotal=50 e desconto=5; após F10, total=45 na linha 8. F5 conclui a resposta HTTP.
+Request the forwarded port 80 URL with /index.php?XDEBUG_TRIGGER=1. At the breakpoint, subtotal=50 and discount=5. After F10, total=45 at line 8. F5 completes the response.
 
-Veja [instruções completas](../README.md) e [resultados observados](../RESULTS.md).
+See [full instructions](../README.md) and [recorded results](../RESULTS.md).

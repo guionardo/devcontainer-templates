@@ -1,42 +1,62 @@
-# Validação dos templates publicados — 04/11/2026
+# Manual validation of published templates
 
-Resultado: os três projetos executaram PHP via Apache e foram depurados com breakpoints reais no VS Code.
+Date: November 4, 2026.
 
-| Projeto | Template OCI | PHP | Xdebug | HTTP | Breakpoint | F10 / variáveis | Continuar |
+All three projects executed PHP through Apache and stopped at real breakpoints in VS Code.
+
+| Project | OCI release | PHP | Xdebug | HTTP | Breakpoint | Step-over | Continue |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| php-5.1.6 | php-5.1.6:0.1.0 | 5.1.6 | 2.0.0 | 200 | index.php:7 | total=45 na linha 8 | Total: 45 |
-| php-5.4 | php-5.4:0.1.0 | 5.4.45 | 2.4.1 | 200 | index.php:7 | total=45 na linha 8 | Total: 45 |
-| php-8.5 | php-8.5:0.1.0 | 8.5.12 | 3.5.3 | 200 | index.php:7 | total=45 na linha 8 | Total: 45 |
+| php-5.1.6 | 0.1.0 | 5.1.6 | 2.0.0 | 200 | index.php:7 | total=45 at line 8 | Total: 45 |
+| php-5.4 | 0.1.0 | 5.4.45 | 2.4.1 | 200 | index.php:7 | total=45 at line 8 | Total: 45 |
+| php-8.5 | 0.1.0 | 8.5.12 | 3.5.3 | 200 | index.php:7 | total=45 at line 8 | Total: 45 |
 
-## Ambiente
+## Test environment
 
-- Windows x64 com Docker Desktop em modo Linux.
-- VS Code 1.143.1, commit e646868227c3e3a9e3f24277c8c7220be42c0be7.
-- Extensão Dev Containers 0.469.0; CLI oficial incluída na extensão: 0.89.0, executada com Node.js 24.22.1. O npx não estava disponível no PATH; foi usada a mesma CLI pelo arquivo JavaScript distribuído com a extensão.
-- PHP Debug `xdebug.php-debug` 1.40.2, instalada automaticamente nos três containers de editor.
-- Fontes: pacotes `ghcr.io/guionardo/devcontainer-templates/<template>:0.1.0`, efetivamente baixados do registro e aplicados aos projetos mínimos.
+- Windows x64 with Docker Desktop in Linux mode.
+- VS Code 1.143.1, commit `e646868227c3e3a9e3f24277c8c7220be42c0be7`.
+- Dev Containers extension 0.469.0; bundled official CLI 0.89.0, executed with Node.js 24.22.1.
+- PHP Debug `xdebug.php-debug` 1.40.2, installed automatically in all three editor containers.
+- Inputs: `ghcr.io/guionardo/devcontainer-templates/<template>:0.1.0`, downloaded from the registry and applied to the projects.
 
-## Procedimento observado
+The test machine had no `npx` command on PATH, so the bundled official CLI was invoked through its JavaScript entry point. This validates OCI consumption through the official implementation, not a separate test of the npx launcher.
 
-Cada pasta foi aberta em sua própria janela do VS Code e reaberta com **Dev Containers: Reopen in Container**. A confiança nas pastas foi confirmada manualmente pelo usuário. Os legados conectaram ao serviço `editor` Bookworm e o PHP executou em serviço separado; o PHP 8.5 recebeu a conexão direta do editor.
+## Observed procedure
 
-Foi definido um breakpoint por F9 na linha 7 de `index.php`, iniciado o listener do launch.json aplicado e enviada uma requisição HTTP. No PHP 8.5, a requisição incluiu `XDEBUG_TRIGGER=1`; nos legados não foi necessário um trigger adicional.
+Each project was opened in its own VS Code window and reopened in a Dev Container. The user manually confirmed workspace trust. Legacy projects connected the editor to Bookworm and ran PHP in a separate service; PHP 8.5 hosted both roles in one container.
 
-Nos três ambientes foi observado **Paused on breakpoint**, em `calcularTotal`, linha 7, com chamada da linha 14. O painel Variables → Locals mostrou preço 12.5, quantidade 4, subtotal 50 e desconto 5. Após F10, a execução parou na linha 8 e total passou a 45. F5 retomou a execução e concluiu a resposta HTTP com as versões esperadas e `Total: 45`.
+A breakpoint was set on line 7 with F9, the supplied listener was started with F5, and an HTTP request was sent. PHP 8.5 used `XDEBUG_TRIGGER=1`; the legacy requests needed no additional trigger.
 
-Não foi necessário corrigir o template publicado para que o debug funcionasse. Apenas nomes Compose e portas HTTP dos projetos legados foram ajustados em `.devcontainer/.env` para isolar estes testes dos ambientes existentes. O servidor do VS Code e o PHP Debug foram provisionados automaticamente na primeira conexão.
+All three showed **Paused on breakpoint**, with the calculation function at line 7 and its caller at line 14. Local variables showed price 12.5, quantity 4, subtotal 50, and discount 5.
 
-## Evidências registradas
+F10 moved execution to line 8 and changed total to 45. F5 resumed execution and completed the HTTP response with the expected runtime versions and `Total: 45`.
 
-- [Respostas HTTP](http-results.json).
-- [Variáveis e call stack do PHP 5.1.6](php51-debug-evidence.txt).
-- [Variáveis e call stack do PHP 5.4](php54-debug-evidence.txt).
-- [Variáveis e call stack do PHP 8.5](php85-debug-evidence.txt).
+No runtime-template correction was required. Only legacy Compose project names and HTTP ports were adjusted locally to isolate the test from existing services.
 
-Os arquivos de evidência de debug contêm trechos do texto de acessibilidade observado na interface, com execução na linha 8 após F10. Índices de elementos e IDs de widgets foram removidos para facilitar a leitura. As capturas visuais foram exibidas durante o teste; não estão armazenadas neste repositório.
+## English source and historical identifiers
 
-## Reprodução e limites
+The original test used Portuguese code identifiers. The maintained example now uses English identifiers; the algorithm and line numbers are unchanged.
 
-Siga o [README](README.md) para abrir cada exemplo e repetir breakpoint, inspeção de variáveis, F10 e continuação. Os arquivos .env locais usados na validação não são publicados: os .env.example fornecem nomes Compose genéricos e as mesmas portas HTTP do teste.
+| Original captured identifier | Current example |
+| --- | --- |
+| `calcularTotal` | `calculateTotal` |
+| `preco` | `price` |
+| `quantidade` | `quantity` |
+| `desconto` | `discount` |
+| `subtotal`, `total` | Unchanged |
 
-A validação foi manual, em Windows x64/Docker Desktop Linux, com um projeto mínimo. Não constitui teste de banco, frameworks ou regras de negócio de aplicações reais, nem validação em outras arquiteturas ou sistemas operacionais. O CI verifica configurações e o instalador; não automatiza as interações com o debugger no VS Code.
+Evidence files below translate UI labels to English but retain the captured identifiers. They describe the original session rather than asserting a second manual GUI validation after the rename. The original report and captures are preserved in [commit 1e1c054](https://github.com/guionardo/devcontainer-templates/tree/1e1c0545b01b0fcec1cfb7738eecbf0c2c00475d/examples/vscode-debug).
+
+## Evidence
+
+- [HTTP responses](http-results.json).
+- [PHP 5.1.6 variables and call stack](php51-debug-evidence.txt).
+- [PHP 5.4 variables and call stack](php54-debug-evidence.txt).
+- [PHP 8.5 variables and call stack](php85-debug-evidence.txt).
+
+The text was extracted from the accessibility view while paused at line 8 after F10. UI element indexes and widget IDs were removed. Screenshots were displayed during validation but are not stored in this repository.
+
+## Repeatability and limits
+
+Follow the [instructions](README.md) to repeat breakpoint, variable inspection, step-over, and continuation. Local environment files are not published; the example files provide generic Compose names and the same test HTTP ports.
+
+This is a manual Windows x64/Docker Desktop Linux test of minimal applications. It does not establish database, framework, business-rule, other-platform, or other-architecture compatibility. CI checks configuration and installer behavior but does not operate the VS Code GUI.

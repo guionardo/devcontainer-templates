@@ -1,6 +1,10 @@
-item da árvore (selectable) $desconto, value 5
-item da árvore (selectable) $subtotal, value 50
-item da árvore (selectable) $total, value 45
-linha (selectable) Stack Frame calcularTotal, line 8, index.php
-linha (selectable) Stack Frame {main}, line 14, index.php
-text return $total;, debugging paused , reason step, index.php:8
+English translation of recorded UI labels. Original code identifiers are retained.
+Recorded manual session: 2026-11-04, OCI templates 0.1.0.
+See RESULTS.md for the current English identifier mapping.
+
+Variable $desconto, value 5
+Variable $subtotal, value 50
+Variable $total, value 45
+Call stack: calcularTotal, line 8, index.php
+Call stack: {main}, line 14, index.php
+UI announcement: return $total;, debugging paused , reason step, index.php:8

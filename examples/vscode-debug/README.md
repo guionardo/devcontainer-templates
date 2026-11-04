@@ -1,20 +1,20 @@
-# Projetos mínimos para validar PHP no VS Code
+# Minimal PHP execution and debugger examples
 
-Os três projetos usam o mesmo `index.php`, compatível com PHP 5.1.6. Os templates foram baixados do GHCR na versão OCI `0.1.0` usando a CLI oficial de Dev Containers (`0.89.0`) incluída na extensão instalada do VS Code. Não foram copiados dos Dockerfiles locais do catálogo.
+These three projects exercise a small calculation compatible with PHP 5.1.6. Their runtime configurations were applied from the published OCI templates `0.1.0` and manually validated in VS Code.
 
-| Pasta | PHP / Xdebug | URL para teste |
+| Folder | Validated PHP / Xdebug | HTTP request |
 | --- | --- | --- |
 | `php-5.1.6` | 5.1.6 / 2.0.0 | http://localhost:18051/index.php |
 | `php-5.4` | 5.4.45 / 2.4.1 | http://localhost:18054/index.php |
-| `php-8.5` | 8.5.12 / 3.5.3 | Porta 80 no painel Ports do VS Code, `/index.php?XDEBUG_TRIGGER=1` |
+| `php-8.5` | 8.5.12 / 3.5.3 | Forward port 80 in VS Code, then request `/index.php?XDEBUG_TRIGGER=1` |
 
-As portas dos legados foram ajustadas em `.devcontainer/.env` para não conflitar com os serviços PHP já existentes na máquina. Cada projeto usa seu próprio container/editor e nome Compose.
+The legacy example ports differ from template defaults to allow other applications to use 8051/8054.
 
-## Obter e preparar um exemplo
+## Prepare an example
 
-Pré-requisitos: Git, Docker Desktop/Engine com containers Linux, VS Code e extensão Dev Containers. Os legados usam linux/amd64; em outras arquiteturas, dependem de emulação. Nenhuma instalação de PHP no host é necessária.
+Prerequisites: Git, Docker with Linux containers, VS Code, and the Dev Containers extension. Legacy runtime images target linux/amd64; other architectures depend on emulation. PHP does not need to be installed on the host.
 
-No PowerShell:
+In PowerShell:
 
 ```powershell
 git clone https://github.com/guionardo/devcontainer-templates.git
@@ -23,40 +23,50 @@ Copy-Item .devcontainer/.env.example .devcontainer/.env
 code .
 ```
 
-Para PHP 5.1.6, escolha a pasta `php-5.1.6` e copie seu arquivo de exemplo. Para PHP 8.5, escolha `php-8.5`; não é necessário um arquivo .env. Em Git Bash/Linux/macOS, use `cp .devcontainer/.env.example .devcontainer/.env` nos legados.
+For PHP 5.1.6, choose `php-5.1.6` and copy its environment example. For PHP 8.5, choose `php-8.5`; no `.env` is required.
 
-Confira `COMPOSE_PROJECT_NAME` e `PHP_HTTP_PORT` no .env de cada legado antes de abrir vários exemplos ou cópias simultaneamente. O .env é ignorado pelo Git. A tabela inicial usa as portas dos arquivos .env.example.
+In Git Bash/Linux/macOS, use `cp .devcontainer/.env.example .devcontainer/.env` for either legacy example.
 
-As configurações versionadas são snapshots dos pacotes OCI 0.1.0 usados no teste. Não acompanham automaticamente mudanças em `src` ou novas versões do GHCR. Aplique uma versão nova em uma pasta temporária e revise as diferenças antes de atualizar o exemplo. Os exemplos ficam fora de `src` e não são incluídos na publicação dos templates.
+Review `COMPOSE_PROJECT_NAME` and `PHP_HTTP_PORT` before opening concurrent copies. Each needs a distinct project name and available HTTP port. Local `.env` files are ignored by Git.
 
-## Repetir o teste no VS Code
+## Repeat the breakpoint test
 
-1. Abra **uma pasta de projeto**, não esta pasta que agrupa os três, e execute **Dev Containers: Reopen in Container**.
-2. Se o VS Code abrir em Restricted Mode, revise a pasta e confirme a confiança manualmente para habilitar execução e debug.
-3. Abra `index.php` e coloque um breakpoint na **linha 7**, com F9.
-4. Pressione F5 para iniciar **Listen for Xdebug**. A extensão PHP Debug é instalada automaticamente pelo Dev Container.
-5. Acesse a URL da tabela. No PHP 8.5, use o endereço local da porta 80 encaminhada pelo VS Code e acrescente `?XDEBUG_TRIGGER=1`.
-6. No painel Run and Debug, expanda Variables → Locals. Ao parar na linha 7: `$preco = 12.5`, `$quantidade = 4`, `$subtotal = 50`, `$desconto = 5`.
-7. Pressione F10. A execução deve avançar para a linha 8, com `$total = 45`.
-8. Pressione F5 para continuar. A resposta HTTP deve mostrar PHP, Xdebug e `Total: 45`. A requisição fica aguardando enquanto estiver parada no breakpoint.
+1. Open **one project folder**, not the parent containing all three, and run **Dev Containers: Reopen in Container**.
+2. If VS Code opens in Restricted Mode, review the project and confirm trust manually.
+3. Open `index.php` and set a breakpoint on **line 7** with F9.
+4. Start **Listen for Xdebug** with F5. The container configuration installs PHP Debug automatically.
+5. Request the URL from the table. PHP 8.5 needs `?XDEBUG_TRIGGER=1`.
+6. In **Run and Debug → Variables → Locals**, inspect `$price = 12.5`, `$quantity = 4`, `$subtotal = 50`, and `$discount = 5`.
+7. Press F10. Execution should move to line 8, with `$total = 45`.
+8. Press F5 to continue. The HTTP response should include PHP and Xdebug versions followed by `Total: 45`.
 
-Não exponha as portas 9000/9003 no Windows: o debugger executa dentro do container do editor. Os legados conectam ao serviço `editor:9000`; o PHP 8.5 conecta ao próprio container, `127.0.0.1:9003`.
+An HTTP request waits while execution is paused. Do not interpret that wait as an application failure.
 
-## Gerenciar os ambientes legados pelo host
+Debugging uses `editor:9000` in the legacy layouts and `127.0.0.1:9003` inside the PHP 8.5 container. The supplied files do not explicitly publish debugger ports on the host.
 
-Na pasta de cada projeto legado:
+## Commands and shutdown
 
-```powershell
+From a host terminal inside either legacy project:
+
+```sh
 docker compose -f .devcontainer/compose.yaml exec php php -v
 docker compose -f .devcontainer/compose.yaml logs --tail=50 php
 ```
 
-Para encerrar o ambiente legado, feche a conexão remota no VS Code e, se necessário, execute:
+Disconnect with **Dev Containers: Reopen Folder Locally**. If necessary, stop legacy services explicitly:
 
-```powershell
+```sh
 docker compose -f .devcontainer/compose.yaml down
 ```
 
-Para o PHP 8.5, use **Dev Containers: Reopen Folder Locally**, que está configurado para parar seu container.
+The PHP 8.5 configuration also stops its container when reopening locally.
 
-As respostas HTTP verificadas estão em [http-results.json](http-results.json). Consulte o [relatório de validação](RESULTS.md) para as evidências de debug, as versões das ferramentas e os limites do teste.
+## Snapshot and evidence policy
+
+Runtime configuration remains a snapshot of the applied `0.1.0` packages. It does not automatically track changes in `src/` or new GHCR releases.
+
+The English revision translates code identifiers, comments, and documentation. The calculation and breakpoint line numbers remain unchanged. Original GUI observations are recorded separately, with a mapping of historical identifiers in the [report](RESULTS.md); they are not claimed as a new GUI test of the translated source.
+
+Examples stay outside `src/` and are not included in OCI package publication. To update a snapshot, apply a new package into a temporary directory and review the differences.
+
+See [HTTP responses](http-results.json), [the report and evidence](RESULTS.md), and the [repository validation summary](../../tests/RESULTS.md).

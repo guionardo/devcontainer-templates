@@ -17,26 +17,26 @@ function fixture(t, versions) {
   return source;
 }
 
-test('aceita uma versão estável consistente em todos os templates', t => {
+test('accepts a consistent stable version across all templates', t => {
   const source = fixture(t, { 'php-5.1.6': '0.1.0', 'php-5.4': '0.1.0', 'php-8.5': '0.1.0' });
   assert.equal(validateRelease(source, 'v0.1.0').length, 3);
 });
-test('recusa publicação parcial quando um template tem versão diferente', t => {
+test('rejects partial publication when a template version differs', t => {
   const source = fixture(t, { 'php-5.4': '0.1.0', 'php-8.5': '0.2.0' });
-  assert.throws(() => validateRelease(source, 'v0.1.0'), /php-8.5.*exige version=0.1.0/);
+  assert.throws(() => validateRelease(source, 'v0.1.0'), /php-8.5.*requires version=0.1.0/);
 });
-test('recusa main, tags incompletas, prereleases e versões com zeros à esquerda', t => {
+test('rejects main, incomplete tags, prereleases, and leading zeroes', t => {
   const source = fixture(t, { 'php-8.5': '0.1.0' });
   for (const tag of ['', 'main', '0.1.0', 'v0.1', 'v01.1.0', 'v0.1.0-beta.1', 'v0.1.0-extra']) {
-    assert.throws(() => validateRelease(source, tag), /tag estável/);
+    assert.throws(() => validateRelease(source, tag), /stable vMAJOR.MINOR.PATCH tag/);
   }
 });
-test('recusa catálogo vazio, ID divergente e configuração ausente', t => {
-  assert.throws(() => validateRelease(fixture(t, {}), 'v0.1.0'), /Nenhum template/);
+test('rejects an empty catalog, mismatched ID, and missing configuration', t => {
+  assert.throws(() => validateRelease(fixture(t, {}), 'v0.1.0'), /No templates/);
   const source = fixture(t, { 'php-8.5': '0.1.0' });
   const metadata = path.join(source, 'php-8.5/devcontainer-template.json');
-  fs.writeFileSync(metadata, JSON.stringify({ id: 'outro', version: '0.1.0' }));
-  assert.throws(() => validateRelease(source, 'v0.1.0'), /ID incompatível/);
+  fs.writeFileSync(metadata, JSON.stringify({ id: 'different', version: '0.1.0' }));
+  assert.throws(() => validateRelease(source, 'v0.1.0'), /ID does not match directory/);
   fs.writeFileSync(metadata, JSON.stringify({ id: 'php-8.5', version: '0.1.0' }));
   fs.unlinkSync(path.join(source, 'php-8.5/.devcontainer/devcontainer.json'));
   assert.throws(() => validateRelease(source, 'v0.1.0'), /ENOENT/);

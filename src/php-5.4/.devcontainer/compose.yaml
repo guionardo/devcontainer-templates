@@ -5,7 +5,7 @@ services:
     volumes:
       - ..:/var/www/html
   php:
-    image: local/devcontainer-php-5.4:0.1.0
+    image: local/devcontainer-php-5.4:0.1.1
     platform: linux/amd64
     build:
       context: .

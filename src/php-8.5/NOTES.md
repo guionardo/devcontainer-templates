@@ -1,13 +1,19 @@
 # PHP 8.5
 
-Estado: build, CLI, carregamento do Xdebug, sintaxe do exemplo, configuração Apache e resposta HTTP validados em 2026-11-04 (Docker Desktop Linux amd64). Abertura pelo VS Code e breakpoint ainda pendentes.
+## Validation status
 
-O VS Code conecta diretamente ao container PHP/Apache.
+The published 0.1.0 baseline passed build, CLI, Xdebug loading, Apache, HTTP, and manual VS Code breakpoint/step-over tests on November 4, 2026 (Windows x64, Docker Desktop Linux amd64). Source 0.1.1 updates English content and metadata; the historical GUI result is attributed to 0.1.0.
 
-Use a configuração Listen for Xdebug e abra devcontainer-smoke.php?XDEBUG_TRIGGER=1. O projeto está montado em /var/www/html nos containers.
+## Editor and runtime
 
-Xdebug 3 inicia a conexão com 127.0.0.1:9003 no próprio container.
+VS Code connects directly to the PHP/Apache container. The integrated terminal uses the runtime interpreter.
 
-Extensões adicionais de banco não são instaladas automaticamente.
+## Debugging
 
-Não inclui banco, dados de produção ou instalação automática de Composer.
+Start Listen for Xdebug in Run and Debug. Request devcontainer-smoke.php?XDEBUG_TRIGGER=1. Xdebug 3 connects to 127.0.0.1:9003 inside the same container.
+
+## Extensions and limits
+
+Additional database extensions are not automatically installed.
+
+No database, production data, or automatic Composer installation is included. Base image tags are not immutable digests; pin them if your project requires that guarantee.

@@ -1,139 +1,169 @@
-# Instalação e distribuição dos templates
+# Installation and distribution
 
-## Instalador imediato: GitHub + shell
+There are two supported installation paths: the official Dev Container CLI consumes OCI packages, while the shell installer applies files from Git source. Both produce local configuration that VS Code can open.
 
-Execute em **Git Bash, WSL, Linux ou macOS**, dentro do projeto existente. Requer `curl` para baixar o script, Git para obter o catálogo e ferramentas POSIX. No Windows, estes comandos são para o Git Bash/WSL, não para o PowerShell.
+## Official CLI and GHCR packages
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh | sh -s -- --php 5.4 --smoke
-```
-
-Troque `5.4` por `5.1` ou `8.5`. O diretório atual é o destino por padrão. Para outro projeto:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh | sh -s -- --php 8.5 --project "/c/dev/minha aplicacao"
-```
-
-Para baixar e revisar o script antes de executá-lo:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh -o install-php-devcontainer.sh
-sh install-php-devcontainer.sh --help
-sh install-php-devcontainer.sh --php 5.4 --project ./minha-aplicacao --smoke
-```
-
-O instalador copia apenas as configurações necessárias e, com `--smoke`, o exemplo de diagnóstico. Não executa Docker, Composer, código PHP ou migrações. O código da aplicação não é modificado.
-
-Se existir `.devcontainer`, a instalação é recusada por padrão. Para atualizar uma configuração existente:
-
-```sh
-sh install-php-devcontainer.sh --php 5.4 --project ./minha-aplicacao --update
-```
-
-Com `--update`, o script:
-
-- Cria `.devcontainer-backup.XXXXXX` no projeto antes de substituir os arquivos conhecidos do template.
-- Atualiza `devcontainer.json`, `Dockerfile` e, quando incluído na versão escolhida, `compose.yaml`. Suas edições nesses arquivos precisam ser reaplicadas a partir do backup.
-- Preserva `.env`, arquivos personalizados, código PHP e o `launch.json` existente.
-- Grava a nova configuração de debug em `.devcontainer/launch.template.json` quando já existe um `launch.json`. Mescle o array `configurations` manualmente.
-- Registra template, referência e commit em `.devcontainer/template-source.txt`.
-
-O script não faz mescla automática de JSON/JSONC e não remove arquivos antigos ao trocar de versão. Ao migrar de um legado para PHP 8.5, por exemplo, um `compose.yaml` anterior pode permanecer, mas o novo `devcontainer.json` não o utiliza. Revise o diff antes de versionar. Não versione backups que contenham configurações locais ou segredos; mova-os para fora do repositório ou ignore-os no `.gitignore` do projeto.
-
-Os legados recebem um nome Compose exclusivo quando `.env` ainda não existe. As portas padrão são 8051 e 8054: altere `PHP_HTTP_PORT` se outros projetos já estiverem usando a mesma porta. Quando `.env` já existe, seus valores são mantidos; confira `COMPOSE_PROJECT_NAME` e `PHP_HTTP_PORT`.
-
-Para usar um catálogo já clonado, sem download:
-
-```sh
-sh /c/dev/devcontainer-templates/scripts/install.sh --php 5.4 --source /c/dev/devcontainer-templates --project /c/dev/minha-aplicacao
-```
-
-`--ref` aceita branch, tag ou SHA Git. `main` acompanha as mudanças do catálogo. Para uma instalação fixada, baixe o próprio script por um SHA completo e passe o mesmo SHA em `--ref`; assim o instalador e os templates vêm da mesma revisão. Uma versão Git/tag só pode ser usada depois de criada no repositório. Referência Git e versão OCI são identificadores distintos.
-
-Depois da instalação, abra a raiz do projeto no VS Code e execute **Dev Containers: Reopen in Container**. Após uma atualização, use **Dev Containers: Rebuild Container**. O [README](../README.md) detalha execução e debug.
-
-## Distribuição oficial: Dev Container Templates em OCI/GHCR
-
-O formato padrão é um template com `devcontainer-template.json` e `.devcontainer/devcontainer.json`, empacotado como artefato OCI. A estrutura `src/php-*` deste catálogo segue esse formato. A [CLI oficial](https://github.com/devcontainers/cli/blob/main/docs/templates/apply.md) baixa o pacote e aplica a configuração em um projeto existente.
-
-### Aplicar usando npx
-
-Instale Node.js/npm, entre na raiz do projeto e escolha **apenas um** dos comandos abaixo. Os comandos funcionam no PowerShell, Git Bash, WSL, Linux e macOS. A versão OCI indicada deve estar publicada no GHCR e acessível à sua conta (ou pública para download sem autenticação).
+Install Node.js/npm and choose **one** command from the root of an existing project.
 
 PHP 5.1.6:
 
-```powershell
+```sh
 npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.1.6:0.1.0
 ```
 
 PHP 5.4:
 
-```powershell
+```sh
 npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:0.1.0
 ```
 
 PHP 8.5:
 
-```powershell
+```sh
 npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-8.5:0.1.0
 ```
 
-Para outro projeto, substitua `--workspace-folder .` por `--workspace-folder "C:\dev\minha-aplicacao"`, por exemplo. Não é necessário clonar o catálogo. A versão após `:` é a versão do template, não a versão do PHP nem a versão da CLI baixada pelo npx.
+These commands work in PowerShell, Git Bash, WSL, Linux, and macOS when Node.js/npm is available. To target another directory, use `--workspace-folder "C:\dev\my-app"`, for example.
 
-Use uma branch do projeto e revise configurações existentes antes de aplicar. Os backups e a preservação de arquivos oferecidos pelo instalador shell não são garantias da CLI oficial. Para atualizar uma configuração já personalizada, prefira o instalador com `--update` ou aplique o pacote OCI em uma pasta temporária e mescle as diferenças.
+The suffix `:0.1.0` selects a template release, not a PHP or CLI version. The examples use the published release that was manually validated. Source metadata is now `0.1.1`; that version requires its own release before it can be downloaded from GHCR.
 
-Nos legados, configure `.devcontainer/.env` com `COMPOSE_PROJECT_NAME` exclusivo e a porta `PHP_HTTP_PORT`, conforme o README. A CLI copia o template, mas não gera esses valores por projeto como faz o instalador shell.
+Apply in a working branch and inspect existing files first. The official CLI does not guarantee the backup and preservation behavior of our custom shell installer. For a customized environment, apply a new OCI release in a temporary directory and merge the changes.
 
-Depois, abra a raiz do projeto no VS Code e execute **Dev Containers: Reopen in Container**. Após atualizar arquivos de um ambiente existente, execute **Dev Containers: Rebuild Container**. A aplicação do pacote não inicia containers nem instala dependências da aplicação automaticamente.
+For legacy templates, create `.devcontainer/.env` with a unique `COMPOSE_PROJECT_NAME` and suitable `PHP_HTTP_PORT`. The official CLI copies template files but does not generate project-specific values as the shell installer does.
 
-### Publicação automática por tags Git
+After applying, run **Dev Containers: Reopen in Container** in VS Code. Use **Dev Containers: Rebuild Container** after updating an existing environment. Applying files alone does not start containers or install application dependencies.
 
-O workflow [Publish Dev Container Templates](../.github/workflows/publish-templates.yaml) é disparado ao enviar uma tag `vMAJOR.MINOR.PATCH`, por exemplo `v0.1.0`. Um push comum em `main` executa as verificações aplicáveis, mas não publica pacotes.
+## Shell installer
 
-Este catálogo usa **versão única por release**: a tag `v0.1.0` exige `"version": "0.1.0"` no `devcontainer-template.json` dos três templates. A versão é independente dos runtimes PHP. Nas próximas releases, incremente os três metadados juntos, mesmo quando apenas um template tiver alterações.
+Requires Git, curl for downloading, and POSIX tools. Run in **Git Bash, WSL, Linux, or macOS**. These shell commands are not PowerShell syntax.
 
-Procedimento para o mantenedor:
-
-1. Atualize a versão nos três arquivos `src/php-*/devcontainer-template.json` e revise a documentação. Para a primeira release, os arquivos já usam `0.1.0`.
-2. Faça commit e envie as alterações para `main`. Aguarde o workflow de validação passar.
-3. Atualize o checkout local e confira o commit que deseja publicar. Para a primeira release:
-
-```powershell
-git switch main
-git pull --ff-only origin main
-node scripts/validate-release.cjs v0.1.0
-git tag -a v0.1.0 -m "Release Dev Container Templates 0.1.0"
-git push origin v0.1.0
-```
-
-4. Acompanhe o workflow na aba **Actions**. A tag precisa apontar para um commit do histórico de `main`; o workflow recusa referências de branch, tags incompletas, prereleases e versões diferentes dos metadados. Os testes do instalador, o validador de release, os JSONs e os arquivos Compose são verificados antes da publicação. Builds PHP e breakpoints não são testados por esse workflow.
-5. Confira os pacotes em [Packages do mantenedor](https://github.com/guionardo?tab=packages). Para download público sem autenticação, configure a visibilidade dos três templates e do pacote de metadados como **public**, conforme as permissões disponíveis.
-6. Teste um dos comandos `npx` acima em uma pasta temporária vazia antes de distribuir a release à equipe.
-
-O workflow usa `GITHUB_TOKEN` com `packages: write`, sem um token pessoal cadastrado no repositório. A ação não cria tags adicionais no Git; a tag enviada pelo mantenedor é o gatilho de release. As tags OCI são gerenciadas pela ação oficial conforme os metadados; os exemplos fixam a versão completa para tornar explícita a release escolhida.
-
-Para a próxima release, use, por exemplo, `0.1.1` nos três metadados e a tag Git `v0.1.1`. Não mova tags publicadas nem reutilize uma versão para conteúdo diferente. Pacotes com uma versão já existente podem ser ignorados pela ferramenta de publicação.
-
-O gatilho manual é mantido para repetir uma publicação da mesma tag após corrigir uma falha de infraestrutura/permissão. Use **Re-run jobs** na execução original ou, com GitHub CLI autenticado:
-
-```powershell
-gh workflow run publish-templates.yaml --ref v0.1.0 --repo guionardo/devcontainer-templates
-```
-
-Executar manualmente com `main` é recusado. Se a correção alterar os arquivos do template, prepare uma nova versão e uma nova tag.
-
-### Tags Git e instalador shell
-
-Após a tag existir, o instalador também pode aplicar exatamente essa release:
+From the application root:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/v0.1.0/scripts/install.sh | sh -s -- --php 5.4 --ref v0.1.0
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh | sh -s -- --php 5.4 --smoke
 ```
 
-Nesse caso, tanto o script quanto o catálogo vêm da mesma tag Git. O pacote equivalente usa `:0.1.0` no endereço GHCR, sem o prefixo `v`.
+Choose `--php 5.1`, `5.4`, or `8.5`. To target another directory:
 
-O VS Code consome os arquivos locais resultantes; não é necessário criar uma extensão própria. Ter o repositório GitHub ou o pacote GHCR não garante que o template apareça automaticamente na lista pública de templates do VS Code. A CLI é o caminho explícito documentado aqui.
+```sh
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh | sh -s -- --php 8.5 --project "/c/dev/my application"
+```
 
-Publicar um template OCI distribui configurações, não imagens PHP pré-compiladas. Com os Dockerfiles atuais, o primeiro uso ainda constrói as imagens localmente.
+To inspect the script before execution:
 
-Fontes oficiais: [template-starter](https://github.com/devcontainers/template-starter), [ação de publicação](https://github.com/devcontainers/action) e [especificação de distribuição](https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainer-templates-distribution.md).
+```sh
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh -o install-php-devcontainer.sh
+sh install-php-devcontainer.sh --help
+sh install-php-devcontainer.sh --php 5.4 --project ./my-app --smoke
+```
+
+The installer copies configuration and optionally the smoke example. It does not invoke Docker, Composer, PHP application code, or database migrations.
+
+### Existing projects and updates
+
+An existing `.devcontainer` folder is rejected by default. To update:
+
+```sh
+sh install-php-devcontainer.sh --php 5.4 --project ./my-app --update
+```
+
+The update creates a `.devcontainer-backup.XXXXXX` directory before replacing known files. It updates `devcontainer.json`, `Dockerfile`, and `compose.yaml` when supplied by the selected template.
+
+It preserves `.env`, custom files, application code, and an existing `launch.json`. The new debug configuration is saved as `.devcontainer/launch.template.json`; manually merge its `configurations` array.
+
+Reapply your custom changes to files replaced by the update. The script does not merge JSON/JSONC or remove obsolete files when switching runtimes. An old Compose file can remain after switching to PHP 8.5, but its new Dev Container configuration does not reference that file.
+
+Keep backups outside version control, particularly when local configuration contains credentials. Existing symbolic links at managed destination paths and a root `.devcontainer.json` require manual integration.
+
+Legacy installations get a unique Compose project name when `.env` does not exist. Default HTTP ports are 8051 and 8054. Configure different ports for concurrent projects; existing `.env` values are preserved.
+
+### Fixed revisions and offline source
+
+`--ref` accepts a Git branch, tag, or full commit SHA. By default it uses `main`, which may contain unreleased source. For a fixed install, download the script from a full commit SHA or existing release tag and pass the same reference with `--ref`.
+
+For example, this existing commit contains the source baseline used before the English update:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/40899ef915b00f47493140ec21049b90f2a94777/scripts/install.sh | sh -s -- --php 5.4 --ref 40899ef915b00f47493140ec21049b90f2a94777
+```
+
+A published OCI version does not prove that a Git tag of the same name exists. Check the repository's tags before using a tag reference. A future Git `v0.1.1` tag and OCI `:0.1.1` version are distinct identifiers.
+
+For a locally cloned catalog:
+
+```sh
+sh /c/dev/devcontainer-templates/scripts/install.sh --php 5.4 --source /c/dev/devcontainer-templates --project /c/dev/my-app
+```
+
+The installer records template, reference, and resolved commit in `.devcontainer/template-source.txt`. With local `--source`, the revision is recorded as `local`.
+
+## What is published
+
+A template has `devcontainer-template.json` metadata and `.devcontainer/devcontainer.json`, plus any required configuration files. The publishing workflow packages only `src/`.
+
+The collection produces four GHCR packages:
+
+| Package | Purpose |
+| --- | --- |
+| `devcontainer-templates/php-5.1.6` | PHP 5.1.6 template |
+| `devcontainer-templates/php-5.4` | PHP 5.4 template |
+| `devcontainer-templates/php-8.5` | PHP 8.5 template |
+| `devcontainer-templates` | Collection metadata for template discovery |
+
+The fourth package is expected and does not represent another PHP runtime. This follows the [official starter's publication model](https://github.com/devcontainers/template-starter#publishing).
+
+Set the template and catalog metadata packages to **Public** for anonymous public downloads. A public Git repository does not automatically make its packages public. Check [package visibility settings](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
+
+The OCI artifacts distribute configurations, not prebuilt runtime images. The first use still compiles the Dockerfiles. Publishing runtime images would be a separate feature.
+
+## Release from a Git tag
+
+The [publication workflow](../.github/workflows/publish-templates.yaml) runs when a `vMAJOR.MINOR.PATCH` tag is pushed. An ordinary `main` push runs applicable checks but does not publish packages.
+
+Although the standard supports independent template versions, this repository uses **one version across all three templates**. A `v0.1.1` tag requires `"version": "0.1.1"` in all three metadata files.
+
+For the prepared English update:
+
+1. Review changes and ensure all three metadata versions are `0.1.1`.
+2. Commit and push to `main`; wait for validation to pass.
+3. Tag the intended commit and push that tag explicitly:
+
+```sh
+git switch main
+git pull --ff-only origin main
+node scripts/validate-release.cjs v0.1.1
+git tag -a v0.1.1 -m "Release Dev Container Templates 0.1.1"
+git push origin v0.1.1
+```
+
+4. Follow **Publish Dev Container Templates** under GitHub Actions.
+5. Verify package versions and visibility, then apply each new package in a temporary project before recommending it to users.
+
+The workflow requires a stable version tag whose commit is in `main` history. It checks metadata versions, release-validator tests, installer behavior, JSON, and Compose before publication. It does not run PHP builds or GUI debugger tests.
+
+Publication uses the automatic `GITHUB_TOKEN` with `packages: write`; no personal token is stored in the repository. Automatic creation of additional repository tags is disabled.
+
+For another release, increment all three metadata files and use a new tag. Do not move published tags or reuse versions for different content; the publishing tool may skip an existing package version.
+
+For a retry after infrastructure or permission failures, rerun the original jobs or dispatch the workflow against the same tag with authenticated GitHub CLI:
+
+```sh
+gh workflow run publish-templates.yaml --ref v0.1.1 --repo guionardo/devcontainer-templates
+```
+
+A manual run against `main` is rejected. If a fix changes template contents, create a new release instead.
+
+## VS Code discovery
+
+VS Code uses the resulting local files. No custom extension is required to consume the templates through the CLI.
+
+Publishing a Git repository or GHCR package does not automatically place a collection in the public VS Code template picker. The official starter describes registration in the shared collection index. Use the CLI identifiers documented here for an explicit installation path.
+
+## References
+
+- [Dev Container Template specification](https://containers.dev/implementors/templates/)
+- [Official CLI: applying templates](https://github.com/devcontainers/cli/blob/main/docs/templates/apply.md)
+- [Template authoring starter](https://github.com/devcontainers/template-starter)
+- [Publishing action](https://github.com/devcontainers/action)
+- [Distribution specification](https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainer-templates-distribution.md)

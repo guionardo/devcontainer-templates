@@ -26,8 +26,8 @@ jobs:
           REF_TYPE: ${{ github.ref_type }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          test "$REF_TYPE" = tag || { echo 'Selecione uma tag vMAJOR.MINOR.PATCH; main não publica pacotes.'; exit 1; }
-          git merge-base --is-ancestor HEAD origin/main || { echo 'A tag deve apontar para um commit do histórico de main.'; exit 1; }
+          test "$REF_TYPE" = tag || { echo 'Select a vMAJOR.MINOR.PATCH tag; main does not publish packages.'; exit 1; }
+          git merge-base --is-ancestor HEAD origin/main || { echo 'The tag must point to a commit in main history.'; exit 1; }
           node scripts/validate-release.cjs "$RELEASE_TAG"
       - name: Check release validator and installer
         run: |

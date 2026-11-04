@@ -1,6 +1,6 @@
 {
   "id": "php-8.5",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "PHP 8.5 + Apache",
   "description": "PHP 8.5 Apache development environment with Xdebug 3.",
   "platforms": [
@@ -10,5 +10,6 @@
     "php",
     "apache",
     "xdebug"
-  ]
+  ],
+  "documentationURL": "https://github.com/guionardo/devcontainer-templates#readme"
 }

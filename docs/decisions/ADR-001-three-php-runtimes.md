@@ -1,23 +1,24 @@
-# ADR-001 — Três runtimes PHP independentes
+# ADR-001: three independent PHP runtimes
 
-- Data: 2026-10-30
-- Status: Aceita
+- Date: 2026-10-30
+- Status: Accepted
 
-## Contexto
+## Context
 
-Os projetos legados usam PHP 5.1.6 e PHP 5.4 e estão em adaptação para PHP 8.5. É necessário continuar executando funcionalidades antigas durante a migração.
+Legacy applications use PHP 5.1.6 and PHP 5.4 while modernization work targets PHP 8.5. Developers need to maintain and inspect existing behavior during migration.
 
-## Decisão
+## Decision
 
-Manter três ambientes de execução independentes: PHP 5.1.6, PHP 5.4 e PHP 8.5. Disponibilizar templates de Dev Containers separados, com configuração específica por versão.
+Provide three independent Dev Container templates, each with runtime-specific configuration and dependencies.
 
-## Consequências
+## Consequences
 
-- Maior fidelidade aos comportamentos e dependências históricas.
-- Possibilidade de executar cenários equivalentes nas versões antigas e nova.
-- Custo adicional de manutenção de imagens e bibliotecas legadas.
-- Isolamento reforçado para versões sem suporte de segurança.
+- Historical environments can retain their required PHP behavior.
+- Developers can run equivalent diagnostic scenarios in separate runtimes.
+- Dependency directories and runtime state must not be shared across incompatible versions.
+- Maintaining unsupported compilers, libraries, and source archives adds work.
+- Legacy environments require isolation and are intended for local development.
 
-## Não decidido
+## Follow-up decisions
 
-Servidor HTTP, banco de dados, extensões e estratégia final de montagem de código.
+This decision did not originally select HTTP servers, databases, extensions, or workspace mounts. The implemented Apache/editor layout is described in [architecture](../architecture.md) and [ADR-003](ADR-003-legacy-editor.md). Database requirements remain application-specific.

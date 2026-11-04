@@ -1,13 +1,19 @@
 # PHP 5.4.45
 
-Estado: build, CLI, carregamento do Xdebug, sintaxe do exemplo, configuração Apache e resposta HTTP validados em 2026-11-04 (Docker Desktop Linux amd64). Abertura pelo VS Code e breakpoint ainda pendentes.
+## Validation status
 
-O VS Code conecta ao serviço editor (Debian Bookworm); o PHP executa no serviço php (Jessie, linux/amd64). O editor não possui PHP: execute comandos no serviço php pelo terminal do host. A validação PHP do editor fica desativada para não analisar código legado com outro interpretador.
+The published 0.1.0 baseline passed build, CLI, Xdebug loading, Apache, HTTP, and manual VS Code breakpoint/step-over tests on November 4, 2026 (Windows x64, Docker Desktop Linux amd64). Source 0.1.1 updates English content and metadata; the historical GUI result is attributed to 0.1.0.
 
-Use a configuração Listen for Xdebug e abra devcontainer-smoke.php. O projeto está montado em /var/www/html nos containers.
+## Editor and runtime
 
-Xdebug 2 inicia a conexão com editor:9000. A porta de debug não é publicada no host. Downloads históricos são feitos em estágio moderno com TLS verificado, mas ainda não possuem checksums: revisar antes de distribuir. Jessie e PHP 5 estão fora de suporte.
+VS Code connects to a Bookworm editor service; PHP runs in a separate Jessie linux/amd64 service. Both mount the project at /var/www/html. The editor has no PHP interpreter, and native PHP validation is disabled. Run PHP from the host with docker compose -f .devcontainer/compose.yaml exec php php -v.
 
-Extensões: mysql, mysqli, pdo_mysql, mbstring, curl e Xdebug.
+## Debugging
 
-Não inclui banco, dados de produção ou instalação automática de Composer.
+Start Listen for Xdebug in Run and Debug. Request devcontainer-smoke.php. Xdebug 2 connects to editor:9000; no debugger port is explicitly published to the host.
+
+## Extensions and limits
+
+The configured extensions include mysql, mysqli, pdo_mysql, mbstring, curl, and Xdebug.
+
+No database, production data, or automatic Composer installation is included. Jessie and PHP 5 are unsupported. Source downloads use a modern TLS-verified stage, but archive checksums and image digests still need to be pinned. Use only for isolated local maintenance.

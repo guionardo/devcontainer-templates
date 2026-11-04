@@ -1,143 +1,98 @@
-# Templates PHP para VS Code Dev Containers
+# PHP Dev Container Templates
 
-Configurações reutilizáveis para desenvolver projetos PHP existentes no VS Code, com Apache e Xdebug. O código da aplicação fica no repositório do projeto e é montado em `/var/www/html` no container.
+Reusable VS Code Dev Container templates for PHP 5.1.6, 5.4, and 8.5, with Apache, Xdebug, OCI distribution through GHCR, and working breakpoint examples.
 
-| Template | PHP validado | Xdebug | Acesso HTTP |
-| --- | --- | --- | --- |
-| `php-5.1.6` | 5.1.6 | 2.0.0 | `http://localhost:8051` |
-| `php-5.4` | 5.4.45 | 2.4.1 | `http://localhost:8054` |
-| `php-8.5` | 8.5.12 | 3.5.3 | Porta 80 encaminhada pelo VS Code |
+| Template ID | Validated PHP | Xdebug | Editor connection | Default HTTP |
+| --- | --- | --- | --- | --- |
+| `php-5.1.6` | 5.1.6 | 2.0.0 | Modern editor container + legacy runtime | localhost:8051 |
+| `php-5.4` | 5.4.45 | 2.4.1 | Modern editor container + legacy runtime | localhost:8054 |
+| `php-8.5` | 8.5.12 | 3.5.3 | Directly to the PHP/Apache container | Port 80 forwarded by VS Code |
 
-Os builds, a execução CLI, o carregamento do Xdebug, a configuração Apache e a resposta HTTP foram validados em Docker Desktop Linux amd64. A abertura no VS Code, os breakpoints, a inspeção de variáveis e o passo com F10 também foram validados nas três versões. Consulte [os resultados](tests/RESULTS.md).
+All three published `0.1.0` templates passed manual HTTP, breakpoint, variable inspection, step-over, and continue tests on Windows x64 with Docker Desktop Linux. See the [validation report](examples/vscode-debug/RESULTS.md).
 
-## Projetos mínimos para testar execução e debug
+**Version status:** the published and manually tested OCI release is `0.1.0`. Source metadata is `0.1.1` for the English documentation and message update; it requires a new release tag before that OCI version can be installed.
 
-Os [três exemplos completos](examples/vscode-debug/README.md) incluem index.php, Dev Container e launch.json aplicados dos pacotes OCI 0.1.0. Abra um exemplo por janela do VS Code e siga o roteiro de breakpoint na linha 7, inspeção de variáveis e F10. O [relatório](examples/vscode-debug/RESULTS.md) registra o teste manual aprovado para PHP 5.1.6, 5.4.45 e 8.5.12.
+## Quick start with the official CLI
 
-## Instalação com npx (pacote OCI)
+Install Node.js/npm, Docker with Linux containers, VS Code, and the **Dev Containers** extension. From the root of an existing application:
 
-Com Node.js/npm instalado, execute na raiz do projeto (PowerShell, Git Bash, WSL, Linux ou macOS):
-
-```powershell
+```sh
 npx @devcontainers/cli templates apply --workspace-folder . --template-id ghcr.io/guionardo/devcontainer-templates/php-5.4:0.1.0
 ```
 
-Escolha `php-5.1.6`, `php-5.4` ou `php-8.5`. A versão `0.1.0` é a versão do template e precisa estar publicada no GHCR. O catálogo não precisa ser clonado. Revise arquivos existentes antes de aplicar; os backups do instalador shell não fazem parte da CLI oficial. Nos legados, configure o nome Compose e a porta em `.devcontainer/.env` conforme o passo 3 abaixo.
+Replace `php-5.4` with `php-5.1.6` or `php-8.5`. No catalog clone is needed. The version after `:` is the **template version**, not the PHP version.
 
-Depois, execute **Dev Containers: Reopen in Container** no VS Code. Consulte os [exemplos para as três versões e o fluxo de publicação por tags](docs/distribution.md#distribuição-oficial-dev-container-templates-em-ocighcr).
+Apply in a working branch and review existing configurations first. The official CLI does not provide the custom backup behavior described for our shell installer.
 
-## Instalação com script shell no projeto existente
+For either legacy template, create `.devcontainer/.env`:
 
-No Git Bash, WSL, Linux ou macOS, entre na raiz do projeto e execute (requer Git e curl):
+```dotenv
+COMPOSE_PROJECT_NAME=my-app-php54
+PHP_HTTP_PORT=8054
+```
 
+Give each concurrent project a distinct Compose name and HTTP port. For PHP 5.1.6, use a suitable name and port 8051. PHP 8.5 does not require this file.
+
+Open the application folder in VS Code and run **Dev Containers: Reopen in Container**. The first build can take several minutes, especially for legacy PHP.
+
+## Install or update with the shell script
+
+Run in **Git Bash, WSL, Linux, or macOS** with Git and curl installed:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh | sh -s -- --php 5.4 --smoke
 ```
 
-Use `--php 5.1`, `--php 5.4` ou `--php 8.5`. O script instala a configuração; depois execute **Dev Containers: Reopen in Container** no VS Code. No Windows, o comando acima é para Git Bash/WSL, não PowerShell.
+Choose `--php 5.1`, `5.4`, or `8.5`. The current directory is the target project. In Windows, this command is for Git Bash/WSL, not PowerShell.
 
-Se o projeto já tem `.devcontainer`, o instalador recusa a sobrescrita. Acrescente `--update` para atualizar os arquivos conhecidos com backup. O `.env`, o `launch.json` existente e os arquivos personalizados são preservados; alterações próprias no Dockerfile/devcontainer.json devem ser reaplicadas a partir do backup. O novo debug fica em `.devcontainer/launch.template.json` para mescla manual.
+To download and inspect the script first:
 
-Veja [instalação, atualização e distribuição oficial](docs/distribution.md) para baixar e revisar o script antes de executar, fixar uma revisão, escolher outro diretório e publicar templates OCI no GHCR. Os passos abaixo também permitem a instalação por cópia manual e detalham o uso do ambiente.
+```sh
+curl -fsSL https://raw.githubusercontent.com/guionardo/devcontainer-templates/main/scripts/install.sh -o install-php-devcontainer.sh
+sh install-php-devcontainer.sh --help
+sh install-php-devcontainer.sh --php 5.4 --project ./my-app --smoke
+```
 
-## 1. Preparar a máquina
+Existing `.devcontainer` folders are rejected unless `--update` is supplied. Updates back up the existing configuration, replace known template files, preserve `.env` and custom files, and keep an existing `launch.json`. A new debug configuration is saved as `.devcontainer/launch.template.json` for manual merging. Reapply your changes to overwritten Dockerfiles and Dev Container JSON from the backup.
 
-Instale Git, VS Code, Docker Desktop configurado para containers Linux e a extensão **Dev Containers** (`ms-vscode-remote.remote-containers`). Mantenha o Docker Desktop iniciado.
+The shell installer downloads Git source. Its default `main` reference can differ from a published OCI release. Use a Git tag or full commit SHA with `--ref` when you need a fixed revision. See [installation and distribution](docs/distribution.md).
 
-Os templates legados usam `linux/amd64`; em outras arquiteturas, dependem de emulação. Não é necessário instalar PHP no Windows.
+## Try the minimal projects
 
-## 2. Baixar o catálogo e escolher a versão
+The [three complete examples](examples/vscode-debug/README.md) contain a minimal PHP calculation, applied Dev Container configuration, and debugger setup. Open one example folder per VS Code window.
 
-Clone este catálogo em uma pasta separada do projeto da aplicação:
+For either legacy example, copy `.devcontainer/.env.example` to `.devcontainer/.env` before reopening in a container. Examples use ports **18051** and **18054**, leaving the template defaults available for other applications.
 
-```powershell
+## Apply files manually
+
+Clone this catalog in a separate folder:
+
+```sh
 git clone https://github.com/guionardo/devcontainer-templates.git
 ```
 
-Escolha uma pasta em `src`: `php-5.1.6`, `php-5.4` ou `php-8.5`. Use a versão compatível com a aplicação; aplicar um template não converte o código PHP nem instala as dependências do projeto.
+Copy the selected `src/php-*/.devcontainer/` folder into your application. Copy `.vscode/launch.json`, or merge its `configurations` entry into an existing file. Optionally copy `devcontainer-smoke.php`. Catalog metadata and `NOTES.md` do not need to be copied.
 
-Os templates podem ser aplicados pelo instalador acima ou por cópia dos arquivos. A publicação no GHCR é automatizada por tags Git `vMAJOR.MINOR.PATCH`, com versão correspondente nos três metadados. Consulte o workflow de publicação para confirmar as releases disponíveis.
+If your project already contains `.devcontainer` or a root `.devcontainer.json`, compare and integrate the configurations rather than replacing them blindly. Keep application code and dependency management in the application repository.
 
-## 3. Aplicar em um projeto existente
+## Run and debug
 
-Faça a alteração em uma branch do projeto, para revisar os arquivos antes de incorporá-los à equipe.
+The default Apache document root is `/var/www/html`, which mounts the application root. Adapt Apache for applications that use a `public/` directory or require rewrite rules.
 
-Copie da pasta do template escolhido:
+For the legacy templates, browse to the configured HTTP port. For PHP 8.5, open port 80 in the VS Code **Ports** panel; its local forwarded port may differ from 80.
 
-- `.devcontainer/` para a raiz do projeto;
-- `.vscode/launch.json` para configurar o debugger;
-- `devcontainer-smoke.php`, opcionalmente, para verificar o ambiente e testar breakpoints.
+To debug:
 
-Se o projeto já tiver `.devcontainer`, compare e mescle a configuração. Se já tiver `.vscode/launch.json`, acrescente a entrada do template ao array `configurations`, preservando as entradas existentes. O arquivo `devcontainer-template.json` e o `NOTES.md` pertencem ao catálogo e não precisam ser copiados.
+1. Open **Run and Debug** and select **Listen for Xdebug**.
+2. Start the listener with F5 and set a breakpoint in a PHP file.
+3. Request the page. For PHP 8.5, append `?XDEBUG_TRIGGER=1`; legacy Xdebug starts the connection automatically.
+4. Inspect local variables, use F10 to step over, and F5 to continue.
 
-Exemplo em PowerShell para um projeto sem Dev Container. Ajuste os três caminhos/valores iniciais:
+The legacy PHP service connects to `editor:9000`. PHP 8.5 connects to `127.0.0.1:9003` inside its own editor/runtime container. You do not need to publish debugger ports on the host. The supplied path mapping is `/var/www/html` to `${workspaceFolder}`.
 
-```powershell
-$catalogo = 'C:\dev\devcontainer-templates'
-$projeto = 'C:\dev\minha-aplicacao'
-$template = 'php-5.4' # ou php-5.1.6 / php-8.5
+### PHP commands
 
-$origem = Join-Path $catalogo "src\$template"
-if (-not (Test-Path -LiteralPath $projeto -PathType Container)) {
-    throw 'A pasta do projeto não existe.'
-}
-if (Test-Path -LiteralPath (Join-Path $projeto '.devcontainer')) {
-    throw 'O projeto já tem .devcontainer. Mescle os arquivos manualmente.'
-}
-Copy-Item -LiteralPath (Join-Path $origem '.devcontainer') -Destination $projeto -Recurse
-
-$vscode = Join-Path $projeto '.vscode'
-New-Item -ItemType Directory -Path $vscode -Force | Out-Null
-if (Test-Path -LiteralPath (Join-Path $vscode 'launch.json')) {
-    Write-Host 'Mescle manualmente a configuração Xdebug no launch.json existente.'
-} else {
-    Copy-Item -LiteralPath (Join-Path $origem '.vscode\launch.json') -Destination $vscode
-}
-
-if (-not (Test-Path -LiteralPath (Join-Path $projeto 'devcontainer-smoke.php'))) {
-    Copy-Item -LiteralPath (Join-Path $origem 'devcontainer-smoke.php') -Destination $projeto
-}
-```
-
-A estrutura resultante será semelhante a:
-
-```text
-minha-aplicacao/
-├── .devcontainer/
-│   ├── devcontainer.json
-│   ├── Dockerfile
-│   └── compose.yaml        # somente PHP 5.1.6 e 5.4
-├── .vscode/
-│   └── launch.json
-├── devcontainer-smoke.php # opcional
-└── ... arquivos existentes da aplicação
-```
-
-Para PHP 5.1.6 e 5.4, crie também `.devcontainer/.env` com um nome Compose exclusivo para o projeto. Isso evita que projetos diferentes compartilhem a identificação padrão da pasta `.devcontainer`:
-
-```dotenv
-COMPOSE_PROJECT_NAME=minha-aplicacao-php54
-PHP_HTTP_PORT=8054
-```
-
-Para PHP 5.1.6, use, por exemplo, `minha-aplicacao-php51` e porta `8051`. Se abrir dois projetos da mesma versão ao mesmo tempo, use nomes e portas diferentes. Esse arquivo não precisa conter senhas; versione apenas valores que possam ser compartilhados com a equipe.
-
-## 4. Abrir no VS Code e acessar a aplicação
-
-1. Abra a raiz do projeto da aplicação no VS Code.
-2. Pressione `Ctrl+Shift+P` e execute **Dev Containers: Reopen in Container**.
-3. Aguarde a construção das imagens e a inicialização. A primeira compilação dos PHP legados pode demorar.
-4. Acesse o endereço HTTP da tabela. No PHP 8.5, abra o painel **Ports**, localize a porta 80 e use **Open in Browser**; o número da porta local pode ser diferente de 80.
-5. Para verificar o PHP, abra `/devcontainer-smoke.php` nesse endereço. A página deve mostrar a versão do PHP e do Xdebug.
-
-As alterações nos arquivos da aplicação são compartilhadas com o container pelo bind mount. O DocumentRoot padrão é `/var/www/html`, a raiz do projeto. Aplicações que servem a partir de `public/`, precisam de regras de rewrite, extensões adicionais ou banco exigem ajustes próprios antes de funcionar integralmente.
-
-Os templates não incluem servidor de banco, dados, credenciais nem instalação automática de Composer. No container, `localhost` aponta para o próprio container: configure o host do banco conforme a rede do seu ambiente.
-
-## 5. Executar comandos PHP
-
-**PHP 8.5:** use o terminal integrado do VS Code conectado ao container:
+**PHP 8.5:** use the integrated terminal inside the Dev Container:
 
 ```sh
 php -v
@@ -145,61 +100,60 @@ php -m
 php -l /var/www/html/devcontainer-smoke.php
 ```
 
-**PHP 5.1.6 e 5.4:** o VS Code conecta ao serviço moderno `editor`, enquanto o PHP e o Apache executam no serviço `php`. O editor não tem interpretador PHP e sua validação PHP nativa fica desativada. Execute os comandos a partir de um PowerShell no host, na raiz do projeto:
+**PHP 5.1.6 and 5.4:** the integrated terminal belongs to the modern `editor` service, which does not contain PHP. From a host terminal at the application root:
 
-```powershell
+```sh
 docker compose -f .devcontainer/compose.yaml exec php php -v
 docker compose -f .devcontainer/compose.yaml exec php php -m
 docker compose -f .devcontainer/compose.yaml exec php php -l /var/www/html/devcontainer-smoke.php
 ```
 
-O editor separado permite manter o runtime Jessie dos legados e usar bibliotecas modernas para o VS Code Server. Veja a [decisão de arquitetura](docs/decisions/ADR-003-editor-legado.md).
+See [ADR-003](docs/decisions/ADR-003-legacy-editor.md) for the reason behind the separate editor.
 
-## 6. Depurar com Xdebug
+### Stop and rebuild
 
-1. No VS Code conectado ao container, abra **Run and Debug** (`Ctrl+Shift+D`).
-2. Selecione **Listen for Xdebug (PHP …)** e pressione `F5`.
-3. Abra `devcontainer-smoke.php` no editor e coloque um breakpoint na atribuição de `$version`.
-4. Acesse a página no navegador. Para PHP 8.5, acrescente `?XDEBUG_TRIGGER=1`; nos legados, o Xdebug está configurado para iniciar automaticamente a conexão.
+Use **Dev Containers: Reopen Folder Locally** to disconnect. The templates are configured to stop their container or Compose services. If needed, stop a legacy environment explicitly from the host:
 
-Nos legados, o PHP conecta a `editor:9000`. No PHP 8.5, conecta a `127.0.0.1:9003` dentro do mesmo container do editor. Não é necessário publicar a porta do debugger no Windows. O `launch.json` mapeia `/var/www/html` para `${workspaceFolder}`; ajuste o mapeamento se mudar o caminho do projeto nos containers.
-
-O carregamento do Xdebug foi verificado, mas a parada efetiva em breakpoints ainda precisa de validação no VS Code, especialmente com Xdebug 2.0.0.
-
-## 7. Parar, reconstruir e compartilhar
-
-Use **Dev Containers: Reopen Folder Locally** para sair do ambiente. Nos legados, para encerrar os serviços manualmente, execute no terminal do host, na raiz do projeto:
-
-```powershell
+```sh
 docker compose -f .devcontainer/compose.yaml down
 ```
 
-Após alterar o Dockerfile ou a configuração, execute **Dev Containers: Rebuild Container**. Para consultar logs dos legados:
+After changing a Dockerfile or configuration, run **Dev Containers: Rebuild Container**. Legacy server logs are available with:
 
-```powershell
+```sh
 docker compose -f .devcontainer/compose.yaml logs --tail=100 php
 ```
 
-Versione `.devcontainer` e a configuração de debug no repositório da aplicação. Assim, os demais desenvolvedores precisam clonar o projeto e reabri-lo em container. O exemplo de smoke test pode ser removido depois da validação.
+## Troubleshooting
 
-Atualizações deste catálogo não são aplicadas automaticamente aos projetos. Compare a nova versão do template com a configuração do projeto e incorpore os ajustes em uma branch.
-
-## Solução de problemas
-
-| Sintoma | Verificação |
+| Symptom | What to check |
 | --- | --- |
-| Docker indisponível | Inicie o Docker Desktop e confirme o modo Linux. |
-| Porta HTTP em uso nos legados | Altere `PHP_HTTP_PORT` em `.devcontainer/.env` e recrie o ambiente. |
-| Projetos legados interferindo entre si | Defina `COMPOSE_PROJECT_NAME` e porta exclusivos para cada projeto. |
-| `php` não encontrado no terminal do legado | O terminal está no serviço `editor`; execute os comandos pelo host com `docker compose … exec php`. |
-| Aplicação falha ao conectar ao banco | Confira host, porta, rede e extensão PHP necessária; o template não cria banco. |
-| Breakpoint não é atingido | Inicie o listener, confira a versão do launch.json, o mapeamento de caminhos e o trigger do PHP 8.5. |
-| Página retorna 404 ou não abre o framework | Confira a pasta pública e a configuração Apache exigida pela aplicação. |
+| Docker is unavailable | Start Docker and select Linux containers. |
+| HTTP port is already used | Change `PHP_HTTP_PORT` and recreate the legacy environment. |
+| Projects interfere with each other | Set a distinct `COMPOSE_PROJECT_NAME` and HTTP port per project. |
+| `php` is missing in a legacy terminal | Run PHP in the `php` service through the host commands above. |
+| Breakpoint is not reached | Check the listener, request trigger, path mapping, and selected debug configuration. |
+| VS Code is in Restricted Mode | Review and trust the project manually to enable execution and debug. |
+| Framework returns 404 | Check its public directory and required Apache configuration. |
+| Database connection fails | Supply the database service/network and required PHP driver; these are application-specific. |
 
-## Estado e limitações
+## Scope and limitations
 
-PHP 5.1.6, PHP 5.4 e Debian Jessie estão fora de suporte; os ambientes legados destinam-se a desenvolvimento local isolado. O PHP 5.1.6 não habilita extensões MySQL no build atual; o PHP 5.4 inclui `mysql`, `mysqli` e `pdo_mysql`. Consulte o `NOTES.md` do template escolhido para os detalhes.
+This repository contains development templates, technical checks, and minimal debugger examples. It does not contain migrated application code, business regression tests, production databases, or automatic Composer installation.
 
-As imagens usam tags e os arquivos-fonte históricos ainda precisam de checksums fixados. A publicação por tags e a validação de configuração/instalador em CI estão implementadas. Builds PHP em CI e automação dos testes de debug continuam no [roadmap](docs/roadmap.md); os breakpoints já foram validados manualmente nos exemplos.
+PHP 5.1.6, PHP 5.4, and Debian Jessie are unsupported. Use the legacy environments for isolated local maintenance with trusted code. They are not production deployment templates.
 
-Referências: [Dev Containers no VS Code](https://code.visualstudio.com/docs/devcontainers/containers), [Dev Container Templates](https://containers.dev/implementors/templates/) e [requisitos Linux](https://code.visualstudio.com/docs/remote/linux).
+PHP 5.1.6 has no MySQL driver enabled in the current build; PDO core alone does not provide MySQL support. PHP 5.4 includes `mysql`, `mysqli`, and `pdo_mysql`. Review each template's notes before applying it to an application.
+
+Base images use tags and historical source archives still need pinned checksums. Passing tests does not establish fully reproducible builds.
+
+## Documentation
+
+- [Documentation guide](docs/README.md)
+- [Installation, OCI packages, and tag-based releases](docs/distribution.md)
+- [Architecture and decisions](docs/architecture.md)
+- [Validation results](tests/RESULTS.md)
+- [Roadmap](docs/roadmap.md)
+- [Draft article: debugging legacy PHP with modern VS Code](docs/articles/debugging-legacy-php-with-dev-containers.md)
+
+Publishing a template OCI package distributes configuration files, not prebuilt PHP runtime images. The first use still builds the Dockerfiles locally.

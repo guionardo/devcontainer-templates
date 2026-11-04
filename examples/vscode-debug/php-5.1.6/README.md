@@ -1,11 +1,11 @@
-# Exemplo mínimo — php-5.1.6
+# Minimal example: php-5.1.6
 
-Snapshot do template OCI `ghcr.io/guionardo/devcontainer-templates/php-5.1.6:0.1.0`, aplicado e validado em 04/11/2026.
+Runtime configuration was applied from OCI template ghcr.io/guionardo/devcontainer-templates/php-5.1.6:0.1.0 and manually tested on November 4, 2026. Code identifiers and annotations have since been translated; see the report for the historical identifier mapping.
 
-Antes de abrir no container, copie `.devcontainer/.env.example` para `.devcontainer/.env`. Ajuste nome Compose e porta se já estiverem em uso.
+Copy .devcontainer/.env.example to .devcontainer/.env before opening the container. Change the Compose name and HTTP port if needed.
 
-Abra **esta pasta** no VS Code e execute **Dev Containers: Reopen in Container**. Marque a linha 7 de `index.php` com F9 e inicie **Listen for Xdebug** com F5.
+Open this folder in VS Code and run **Dev Containers: Reopen in Container**. Set a breakpoint on index.php:7 with F9 and start **Listen for Xdebug** with F5.
 
-Acesse http://localhost:18051/index.php. No breakpoint: subtotal=50 e desconto=5; após F10, total=45 na linha 8. F5 conclui a resposta HTTP.
+Request http://localhost:18051/index.php. At the breakpoint, subtotal=50 and discount=5. After F10, total=45 at line 8. F5 completes the response.
 
-Veja [instruções completas](../README.md) e [resultados observados](../RESULTS.md).
+See [full instructions](../README.md) and [recorded results](../RESULTS.md).

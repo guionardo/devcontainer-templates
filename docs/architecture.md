@@ -1,31 +1,52 @@
-# Arquitetura — catálogo de Dev Container Templates
+# Architecture: a PHP Dev Container template catalog
 
-## Escopo
+## Scope
 
-Este repositório distribui configurações reutilizáveis de ambiente de desenvolvimento. **Não hospeda aplicações PHP, código migrado nem testes funcionais de projetos de terceiros.** É permitido incluir exemplos mínimos autocontidos exclusivamente para validar execução e depuração no VS Code.
+This repository distributes reusable development environment configuration. Application repositories own their source code, dependencies, migrations, and business regression tests. Minimal standalone examples are included only to validate execution and debugging.
 
-## Templates
+## Runtime templates
 
-- `php-5.1.6`: ambiente isolado para manter e depurar aplicações legadas.
-- `php-5.4`: ambiente isolado para manter e depurar aplicações legadas.
-- `php-8.5`: ambiente para desenvolver e depurar a versão modernizada.
+| Template | Runtime | Editor |
+| --- | --- | --- |
+| `php-5.1.6` | PHP 5.1.6 and Apache CGI on Debian Jessie | Separate Bookworm service |
+| `php-5.4` | PHP 5.4.45 and Apache module on Debian Jessie | Separate Bookworm service |
+| `php-8.5` | Official PHP 8.5 Apache image | Same container as the runtime |
 
-Cada template contém metadados `devcontainer-template.json`, `.devcontainer/devcontainer.json` e, quando necessário, Dockerfile/scripts. A configuração é aplicada no **repositório da aplicação**, que continua dono de seu código, dependências e testes de regressão.
+The legacy editor service hosts VS Code Server and PHP Debug. Both services mount the application at `/var/www/html`, so the debugger and PHP agree on source paths. Xdebug connects to `editor:9000` through the Compose network. The host only needs the HTTP port.
 
-Os templates usam Apache conforme as configurações existentes. Os legados conectam o VS Code a um editor Bookworm separado do runtime Jessie; veja `decisions/ADR-003-editor-legado.md`.
+PHP 8.5 runs the editor and runtime in one compatible container; Xdebug connects to its local listener on port 9003. See [ADR-003](decisions/ADR-003-legacy-editor.md).
 
-## Validação do catálogo
+## Repository layout
 
-Verificar build do ambiente, versão do PHP, extensões necessárias, integração do VS Code e funcionamento do debugger. Um script PHP pequeno e autocontido pode ser usado como smoke test de breakpoints. Não incorporar código real dos legados.
+- `src/`: independently packaged templates and their metadata.
+- `scripts/`: shell installer and release version validator.
+- `tests/`: configuration, installer, release validation, and HTTP smoke checks.
+- `examples/vscode-debug/`: applied template snapshots and minimal PHP projects.
+- `docs/`: architecture, distribution, decisions, and an article draft.
+- `.github/workflows/`: validation and tag-triggered OCI publication.
 
-## Restrições
+Only `src/` is passed to the publishing action. Examples and article content are not added to the OCI packages.
 
-- PHP 5.1.6 e 5.4 estão sem suporte: fixar dependências, reduzir privilégios e evitar exposição externa.
-- Não assumir servidor HTTP, banco ou extensões sem levantamento.
-- Não compartilhar diretórios de dependências incompatíveis entre runtimes.
+## Build strategy
 
-## Validação e distribuição implementadas
+The legacy Dockerfiles compile PHP and compatible Xdebug versions with historical dependencies. A modern curl stage downloads source archives with certificate verification, avoiding the obsolete TLS client in Jessie. Debian packages still come from archived repositories.
 
-Os [exemplos mínimos](../examples/vscode-debug/README.md) registram execução e debug manual aprovados com Apache, Xdebug 2.0.0/2.4.1/3.5.3 e VS Code. Os exemplos ficam fora de src e não são publicados nos pacotes OCI. A [distribuição](distribution.md) usa GHCR, com publicação por tags Git.
+The PHP 5.1.6 image uses CGI because its historical Apache module cannot be used with the selected Apache 2.4 setup. The PHP 5.4 image uses Apache's prefork MPM.
 
-Requisitos adicionais de extensões e banco continuam sendo definidos por cada aplicação.
+Source archive checksums and base image digests are not fully pinned. Existing successful builds include cached dependency layers; do not describe them as clean-room or fully reproducible builds.
+
+## Validation boundaries
+
+CI checks release rules, installer behavior, JSON, and Compose configuration. PHP image builds, HTTP execution, and VS Code breakpoint tests were also performed manually; see [results](../tests/RESULTS.md).
+
+A working debugger in the minimal examples does not establish compatibility with a particular framework, database, dependency tree, or business workflow. PHP extensions and database topology remain application decisions.
+
+## Distribution and versions
+
+Templates follow the Dev Container Template metadata layout and are published to GHCR as OCI artifacts. A separate catalog metadata package supports discovery.
+
+The specification permits per-template versions. This repository deliberately uses one coordinated version across all three templates, enforced by tags `vMAJOR.MINOR.PATCH`. See [distribution](distribution.md) for the release process.
+
+## Constraints
+
+Legacy runtimes are unsupported and intended for isolated local maintenance. Keep their dependency directories separate from modern projects, expose only needed ports, and avoid sharing production data or credentials through examples.
